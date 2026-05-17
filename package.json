@@ -11,5 +11,9 @@
   "devDependencies": {
     "typescript": "~6.0.2",
     "vite": "^8.0.12"
+  },
+  "dependencies": {
+    "handlebars": "^4.7.9",
+    "navigo": "^8.11.1"
   }
 }
