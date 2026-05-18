@@ -10,10 +10,12 @@
 \usepackage{float}
 \usepackage{graphicx}
 \usepackage{indentfirst}
+\usepackage{booktabs}
 \usepackage{setspace}
 \usepackage{hyperref}
 \usepackage[margin=2.54cm]{geometry}
 \usepackage{lipsum}
+\usepackage{tabularx}
 
 \setmainfont{Arimo}
 \doublespacing
@@ -64,20 +66,62 @@
 % ==================================
 \addcontentsline{toc}{section}{Introducción}
 
-\noindent En el presente documento se especifica el proceso de desarrollo de \emph{My Letter Locker}\footnote{Proyecto final para la asignatura Teoría de Lenguajes Formales de la Universidad del Quindío}, una página web que permite crear y compartir cartas digitales cifradas. En un contexto donde la privacidad de la comunicación digital es una necesidad creciente, esta aplicación busca garantizar que solo el remitente y el destinatario puedan acceder al contenido de las cartas mediante cifrado. Desde la perspectiva de los lenguajes formales, el proyecto implementa expresiones regulares y autómatas para validar patrones en los textos (titulo, correos, URLs, fechas, etc.) y verificar las entradas del usuario de forma interactiva.
+\noindent En el presente documento se especifica el proceso de desarrollo de \emph{My Letter Locker}\footnote{Proyecto final para la asignatura Teoría de Lenguajes Formales de la Universidad del Quindío}, una aplicación web que permite crear y compartir cartas digitales cifradas. En un contexto donde la privacidad de la comunicación digital es una necesidad creciente, esta aplicación busca garantizar que solo el remitente y el destinatario puedan acceder al contenido de las cartas mediante cifrado simétrico, sin intermediarios ni almacenamiento persistente.
+
+Desde la perspectiva de los lenguajes formales, el proyecto implementa expresiones regulares para definir patrones de validación (título, correos electrónicos, URLs, fechas, etc.), así como autómatas finitos para el análisis sintáctico de las entradas del usuario y la gestión de los comandos de personalización. A lo largo de este documento se detallan la definición del proyecto, los requisitos, el diseño e implementación, las evidencias y las conclusiones obtenidas.
 
 % ==================================
-\section{Definición del Proyecto}
+\section{Definición del proyecto}
+\emph{My Letter Locker} es una aplicación web que permite la creación y compartición de cartas digitales cifradas, donde los mensajes existen exclusivamente como contenido embebido en URLs y no requieren almacenamiento en una base de datos. Desde la perspectiva de la teoría de lenguajes formales, el sistema emplea expresiones regulares para definir patrones de validación para campos como correo electrónico, URLs, fechas y títulos, los cuales son procesados mediante autómatas finitos que realizan el análisis sintáctico correspondiente. El cifrado simétrico del contenido garantiza que solo quienes conocen la palabra secreta puedan descifrar y leer el mensaje, proporcionando privacidad en la comunicación.
+
+Sobre esta base técnica, la aplicación se distingue por un conjunto de características orientadas al usuario. La creación es instantánea y no requiere registro previo, eliminando barreras de entrada: El mensaje viaja exclusivamente embebido en la URL, sin que el servidor almacene copia alguna, lo que implica que el acceso depende únicamente de quien posea el enlace. A ello se suma un mecanismo de personalización mediante palabras reservadas —comandos escritos al inicio del mensaje— que permiten adaptar el entorno de la carta (tema visual, tipografía, iluminación y música de fondo), ofreciendo una experiencia envolvente sin comprometer la ligereza del sistema. De este modo, la arquitectura fundamentada en el procesamiento formal de lenguajes hace que \emph{My Letter Locker} sea ligera, portable y utilizable en cualquier dispositivo sin necesidad de infraestructura persistente.
 
 
-\subsection{Objetivos de \emph{My Letter Locker}}
-\lipsum[2]
+\subsection{Requisitos y especificaciones}
 
-\subsubsection{Objetivos Tecnicos}
-\lipsum[3]
+A continuación se detallan los requisitos del sistema. Por un lado, los \textbf{objetivos técnicos} definen las capacidades internas que debe garantizar la aplicación en cuanto a validación, análisis sintáctico, generación de identificadores y cifrado. Por otro lado, los \textbf{objetivos funcionales} describen las características perceptibles para el usuario final: creación sin registro, cifrado embebido en URL, personalización del entorno mediante palabras reservadas, desbloqueo con palabra secreta y ausencia de persistencia en servidor.
+
+\subsubsection{Objetivos Técnicos}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{p{3.5cm}X}
+\toprule
+\textbf{Objetivo} & \textbf{Descripción} \\
+\midrule
+Validación de patrones & Verificación de formato de correo electrónico, URL, fecha y título mediante expresiones regulares \\
+\addlinespace[0.6cm]
+Análisis sintáctico & Modelado y validación de la estructura del mensaje entrante usando autómatas finitos \\
+\addlinespace[0.6cm]
+Generación de identificadores & Creación de tokens únicos para cada carta, embebidos en las URLs \\
+\addlinespace[0.6cm]
+Cifrado simétrico & Algoritmo para cifrar y descifrar el contenido de la carta de forma segura \\
+\bottomrule
+\end{tabularx}
+\end{table}
 
 \subsubsection{Objetivos Funcionales}
-\lipsum[3]
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\textwidth}{p{3.5cm}X}
+\toprule
+\textbf{Objetivo} & \textbf{Descripción} \\
+\midrule
+Creación sin registro & El usuario redacta el mensaje y define la palabra secreta sin necesidad de crear una cuenta \\
+\addlinespace[0.6cm]
+Cifrado en URL & El contenido se cifra y se embebe directamente en la URL, sin almacenamiento en el servidor \\
+\addlinespace[0.6cm]
+Personalización del entorno & Mediante palabras reservadas al inicio del mensaje, se adapta el entorno de la carta (tema visual, tipografía, iluminación y música de fondo), ofreciendo una experiencia envolvente \\
+\addlinespace[0.6cm]
+Desbloqueo con palabra secreta & El destinatario debe ingresar la palabra secreta para descifrar y acceder al mensaje \\
+\addlinespace[0.6cm]
+Sin persistencia en servidor & El mensaje no se almacena en base de datos ni en el servidor; toda la información viaja embebida en la URL \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+
 
 % ==================================
 \section{Diseño e implementación}
