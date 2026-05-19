@@ -46,13 +46,18 @@ export type TransitionCallback = (t: TransitedStatus, n: StatusDeclaration) => v
 export class Automaton {
   private transitionsByStatus: Map<string, TransitionDeclaration[]> = new Map();
   private transitionCallbacks: Map<string, TransitionCallback[]> = new Map();
+  private initialStatus: TransitedStatus;
   private currentStatus: TransitedStatus;
 
   constructor(startingStatus: StatusDeclaration) {
-    this.currentStatus = new TransitedStatus(startingStatus, "");
+    this.initialStatus = new TransitedStatus(startingStatus, "")
+    this.currentStatus = this.initialStatus;
   }
 
   run(str: string) {
+    // reiniciar automata
+    this.currentStatus = this.initialStatus;
+
     for (const chr of str) {
       const trns = this.transitionsByStatus.get(this.currentStatus.status.id);
 
@@ -95,5 +100,9 @@ export class Automaton {
       this.transitionsByStatus.set(t.from.id, trns = []);
     }
     trns.push(t);
+  }
+  
+  clearOnTransitions() {
+    this.transitionCallbacks.clear();
   }
 }
