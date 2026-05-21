@@ -4,10 +4,6 @@
   --font-sans: "inter";
 }
 
-/* @tailwind base;
-@tailwind components;
-@tailwind utilities; */
-
 /* Cuerpo e interfaz global */
 .editor-body {
   @apply h-full flex flex-col justify-between antialiased bg-slate-50 text-slate-800;
@@ -135,26 +131,3 @@
 .btn-primary-modal {
   @apply px-4 py-1.5 bg-slate-900 text-white font-medium text-xs rounded-lg hover:bg-slate-800 transition-colors duration-200 active:scale-95;
 }
-
-/* .main__input {
-  @apply p-4 border-slate-200 border shadow resize-none focus:outline-blue-300 focus:outline focus:outline-2 w-[70%] max-w-[1000px] h-[70%];
-}
-
-.preview {
-}
-
-.navbar__container {
-  @apply flex flex-col items-center w-full;
-}
-
-.navbar {
-  @apply shadow shadow-black/30 border  border-gray-300 flex flex-row w-max;
-}
-
-.navbar__item {
-  @apply h-20 w-10 flex items-center justify-center p-2 px-4 w-max;
-}
-
-.navbar__item:focus {
-  width: ;
-} */

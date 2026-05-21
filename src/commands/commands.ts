@@ -1,17 +1,29 @@
+/**
+ * tipo que define la estructura de un comando de LetterLocker
+ */
 export type LetterLockerCommand = (value: string, mods: string[]) => string | undefined;
 
+/**
+ * expresa que no se ha podido encontrar un comando
+ */
 export class CommandNotFoundError extends Error {
   constructor(name: string) {
     super(`no ha encontrado el comando <${name}>`);
   }
 }
 
+/**
+ * expresa el mal formato o la falta a un aspecto para el modificador de un comando
+ */
 export class BadCommandModifierError extends Error {
   constructor(message: string) {
     super(message);
   }
 }
 
+/**
+ * clase que facilita y encapsula el manejo de comandos
+ */
 export class CommandManager {
   // comandos dentro del manejador
   private commands: Map<string, LetterLockerCommand>;
@@ -62,11 +74,20 @@ export class CommandManager {
   }
 }
 
+/*
+ |----------------------------------------------------------------------------
+ | COMANDOS GENERICOS
+ |----------------------------------------------------------------------------
+ | a partir de este punto se encuentran los comandos de uso generico,
+ | es decir, que responden a necesidades basicas (normalmente de renderizado)
+ |/
+
 /**
- * Generic bold command
+ * comando generico para negrita
  */
 export class BoldLetterCommand {
-  static name: string = 'bold'; // recommended command name
+  // nombre recomendado para el comando
+  static name: string = 'bold';
 
   static render(value: string): string | undefined {
     return `<b>${value}</b>`;
@@ -74,10 +95,11 @@ export class BoldLetterCommand {
 }
 
 /**
- * Generic italic command
+ * comando generico para italica
  */
 export class ItalicCommand {
-  static name: string = 'italic'; // recommended command name
+  // nombre recomendado para el comando
+  static name: string = 'italic';
 
   static render(value: string): string | undefined {
     return `<i>${value}</i>`;
@@ -85,9 +107,10 @@ export class ItalicCommand {
 }
 
 /**
- * generic title command
+ * comando generico para titulos
  */
 export class TitleCommand {
+  // nombre recomendado para el comando
   static name: string = 'title'
 
   static render(value: string, params: string[]): string | undefined {
