@@ -1,4 +1,5 @@
 import { BoldLetterCommand, CommandManager, CommandNotFoundError, ItalicCommand, TitleCommand, type LetterLockerCommand } from "../commands/commands";
+import { PassCommand } from "../commands/passCommand";
 import { Automaton, TransitionDeclaration, StatusDeclaration } from "./automaton";
 
 // estado inicial leyendo texto plano
@@ -54,6 +55,8 @@ export class LetterLockerPreviewer {
   // private commands: Map<string, LetterLockerCommand>;
   private commands: CommandManager;
 
+  // clave de cifrado extraída del comando pass (primera ocurrencia)
+  public extractedPassphrase: string | undefined = undefined;
 
   // variables temporales utilizadas en el renderizado
   private commandName: string = '';
@@ -76,6 +79,7 @@ export class LetterLockerPreviewer {
     this.commands.registerCommand(BoldLetterCommand.name, BoldLetterCommand.render);
     this.commands.registerCommand(ItalicCommand.name, ItalicCommand.render);
     this.commands.registerCommand(TitleCommand.name, TitleCommand.render);
+    this.commands.registerCommand(PassCommand.name, PassCommand.render);
   }
 
   /**
@@ -94,6 +98,10 @@ export class LetterLockerPreviewer {
       if (n.id === Q2.id) {
         this.commandValue += t.newSymbol;
       } else if (n.id === Q0.id) { // fin del commando
+        // capturar passphrase del comando pass (solo primera ocurrencia no vacía)
+        if (this.commandName === PassCommand.name && this.commandValue !== '' && this.extractedPassphrase === undefined) {
+          this.extractedPassphrase = this.commandValue;
+        }
         try {
           this.htmlPreview += this.commands.callComand(this.commandName, this.commandValue);
         } finally {
@@ -111,6 +119,7 @@ export class LetterLockerPreviewer {
     this.htmlPreview = '';
     this.commandValue = '';
     this.commandName = '';
+    this.extractedPassphrase = undefined;
 
     this.automaton.run(content);
 

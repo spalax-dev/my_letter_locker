@@ -17,6 +17,9 @@
     </div>
 
     <textarea id="editor" class="editor-textarea" placeholder="Empieza a escribir tu carta aquí..."></textarea>
+
+    <!-- Mensaje de error inline del editor -->
+    <p id="editor-error-msg" class="input-error-msg" style="display:none;"></p>
   </main>
 
   <!-- Barra de herramientas inferior -->
@@ -27,6 +30,11 @@
         <button class="btn-utility" id="open-preview-btn">
           <i data-lucide="eye" class="icon-slate"></i>
           <span>Vista previa</span>
+        </button>
+
+        <button class="btn-utility" id="encrypt-btn">
+          <i data-lucide="lock" class="icon-slate"></i>
+          <span>Cifrar carta</span>
         </button>
 
         <button class="btn-utility">
@@ -61,6 +69,82 @@
       <footer class="modal-footer">
         <span class="text-xs text-slate-400">Modo lectura activo</span>
         <button class="btn-primary-modal" id="close-preview-btn">Cerrar</button>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- KeyInputModal: modal para ingresar la clave de cifrado -->
+  <div id="key-input-modal" class="modal-overlay">
+    <div class="modal-card modal-card--sm">
+
+      <header class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="lock" class="icon-slate"></i>
+          <h2>Clave de cifrado</h2>
+        </div>
+        <button class="btn-close-modal" id="close-key-modal-btn" aria-label="Cerrar modal de clave">
+          <i data-lucide="x" class="icon-slate"></i>
+        </button>
+      </header>
+
+      <div class="modal-content">
+        <p class="text-sm text-slate-500 mb-4">Ingresa la clave secreta para cifrar tu carta. El receptor necesitará esta misma clave para leerla.</p>
+        <input
+          type="password"
+          id="key-input"
+          class="key-input-field"
+          placeholder="Clave secreta..."
+          autocomplete="off"
+        />
+        <p id="key-input-error" class="input-error-msg" style="display:none;">La clave no puede estar vacía.</p>
+      </div>
+
+      <footer class="modal-footer">
+        <span></span>
+        <button class="btn-primary-modal" id="confirm-key-btn">Confirmar</button>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- EncryptionModal: modal que muestra el ciphertext resultante -->
+  <div id="encryption-modal" class="modal-overlay">
+    <div class="modal-card modal-card--sm">
+
+      <header class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="lock" class="icon-slate"></i>
+          <h2>Carta cifrada</h2>
+        </div>
+        <button class="btn-close-modal" id="close-encryption-modal-btn" aria-label="Cerrar modal de cifrado">
+          <i data-lucide="x" class="icon-slate"></i>
+        </button>
+      </header>
+
+      <div class="modal-content">
+        <p class="text-sm text-slate-500 mb-4">Copia el texto cifrado y compártelo con el receptor. Solo quien tenga la clave podrá leerlo.</p>
+        <textarea
+          id="ciphertext-output"
+          class="ciphertext-textarea"
+          readonly
+          placeholder="El texto cifrado aparecerá aquí..."
+        ></textarea>
+        <p class="text-xs text-slate-400 mt-3">La carta también se guardó localmente. Puedes abrirla directamente en esta sesión.</p>
+      </div>
+
+      <footer class="modal-footer">
+        <button class="btn-utility" id="read-card-link-btn">
+          <i data-lucide="external-link" class="icon-slate"></i>
+          <span>Abrir carta</span>
+        </button>
+        <div class="flex items-center gap-2">
+          <button class="btn-utility" id="copy-ciphertext-btn">
+            <i data-lucide="copy" class="icon-slate"></i>
+            <span id="copy-btn-label">Copiar</span>
+          </button>
+          <button class="btn-primary-modal" id="close-encryption-btn">Cerrar</button>
+        </div>
       </footer>
 
     </div>

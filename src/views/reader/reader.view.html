@@ -1,1 +1,34 @@
-reader - - view
+<div class="app-page">
+
+  <!-- Header compartido con branding -->
+  <header class="app-header">
+    <span class="app-brand">
+      <i data-lucide="file-text" class="brand-icon"></i>
+      Letter Locker
+    </span>
+    <span class="app-header-mode">Mis Cartas</span>
+  </header>
+
+  <!-- Contenido principal -->
+  <main class="reader-main">
+
+    <div class="reader-header">
+      <h1 class="reader-title">Cartas recibidas</h1>
+      <p class="reader-subtitle">Cartas que has descifrado en este dispositivo</p>
+    </div>
+
+    <!-- Lista de cartas -->
+    <div id="history-list" class="history-list">
+      <!-- Se rellena dinámicamente -->
+    </div>
+
+    <!-- Estado vacío -->
+    <div id="history-empty" class="history-empty" style="display:none;">
+      <i data-lucide="inbox" class="history-empty-icon"></i>
+      <p class="history-empty-text">Aún no has leído ninguna carta</p>
+      <p class="history-empty-sub">Las cartas que descifres aparecerán aquí</p>
+    </div>
+
+  </main>
+
+</div>

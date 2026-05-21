@@ -29,6 +29,10 @@
   @apply text-xs font-medium tracking-wider uppercase text-indigo-500;
 }
 
+.app-header-nav {
+  @apply flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors duration-200;
+}
+
 /* Iconos genéricos */
 .icon-slate {
   @apply w-4 h-4 text-slate-500;
@@ -152,16 +156,22 @@
   @apply flex-1 flex items-start justify-center px-4 py-12;
 }
 
+/* Wrapper relativo que contiene el sello flotante y la carta */
+.letter-card-wrapper {
+  @apply relative w-full max-w-2xl pt-6;
+}
+
 .letter-card {
-  @apply w-full max-w-2xl bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden;
+  @apply w-full bg-white rounded-2xl shadow-sm border border-slate-200/80;
 }
 
 .letter-card-stripe {
-  @apply h-1.5 bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400;
+  @apply h-1.5 bg-gradient-to-r from-indigo-400 via-violet-400 to-purple-400 rounded-t-2xl;
 }
 
+/* Sello flotante centrado sobre la carta */
 .letter-seal-wrapper {
-  @apply flex justify-center -mt-6 mb-2;
+  @apply absolute top-0 left-1/2 -translate-x-1/2 z-10;
 }
 
 .letter-seal {
@@ -173,7 +183,7 @@
 }
 
 .letter-title-section {
-  @apply px-10 pt-8 pb-4 text-center;
+  @apply px-10 pt-10 pb-4 text-center;
 }
 
 .letter-title {
@@ -198,4 +208,116 @@
 
 .footer-icon {
   @apply w-3.5 h-3.5 text-emerald-400;
+}
+
+/* ============================================================
+   ENCRYPTION / DECRYPTION MODALS — Componentes de cifrado
+   ============================================================ */
+
+/* Variante compacta del modal-card para modales de clave */
+.modal-card--sm {
+  @apply max-w-md h-auto;
+}
+
+/* Campo de entrada de clave */
+.key-input-field {
+  @apply w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition-colors duration-200;
+}
+
+/* Textarea de solo lectura para el ciphertext */
+.ciphertext-textarea {
+  @apply w-full h-36 px-3 py-2 text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg shadow-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition-colors duration-200;
+}
+
+/* Mensaje de error inline */
+.input-error-msg {
+  @apply mt-2 text-xs text-red-500 font-medium;
+}
+
+/* Estado "copiado" del botón copiar */
+.btn-copied {
+  @apply text-emerald-600;
+}
+
+.btn-copied .icon-slate {
+  @apply text-emerald-500;
+}
+
+/* ============================================================
+   READER VIEW — Historial de cartas leídas
+   ============================================================ */
+
+.reader-main {
+  @apply flex-1 max-w-2xl w-full mx-auto px-4 py-10 flex flex-col gap-6;
+}
+
+.reader-header {
+  @apply flex flex-col gap-1;
+}
+
+.reader-title {
+  @apply text-xl font-bold text-slate-800 tracking-tight;
+}
+
+.reader-subtitle {
+  @apply text-sm text-slate-400;
+}
+
+/* Lista */
+.history-list {
+  @apply flex flex-col gap-3;
+}
+
+/* Item */
+.history-item {
+  @apply flex items-center gap-4 bg-white border border-slate-200/80 rounded-xl px-4 py-3 shadow-sm hover:shadow-md transition-shadow duration-200;
+}
+
+.history-item-icon {
+  @apply w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center shrink-0;
+}
+
+.history-lock-icon {
+  @apply w-4 h-4 text-indigo-400;
+}
+
+.history-item-body {
+  @apply flex-1 flex flex-col gap-0.5 min-w-0;
+}
+
+.history-item-id {
+  @apply text-xs font-mono text-slate-500 truncate;
+}
+
+.history-item-date {
+  @apply text-xs text-slate-400;
+}
+
+.history-item-actions {
+  @apply flex items-center gap-1 shrink-0;
+}
+
+.history-delete-btn {
+  @apply p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-400 transition-colors duration-200 active:scale-95;
+}
+
+.history-delete-icon {
+  @apply w-4 h-4;
+}
+
+/* Estado vacío */
+.history-empty {
+  @apply flex-1 flex flex-col items-center justify-center gap-3 py-20 text-center;
+}
+
+.history-empty-icon {
+  @apply w-10 h-10 text-slate-300;
+}
+
+.history-empty-text {
+  @apply text-sm font-medium text-slate-500;
+}
+
+.history-empty-sub {
+  @apply text-xs text-slate-400;
 }

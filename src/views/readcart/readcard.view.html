@@ -6,42 +6,85 @@
       <i data-lucide="file-text" class="brand-icon"></i>
       Letter Locker
     </span>
-    <span class="app-header-mode">Modo Lectura</span>
+    <a href="/read" class="app-header-nav">
+      <i data-lucide="arrow-left" class="icon-slate"></i>
+      <span>Mis cartas</span>
+    </a>
   </header>
 
   <!-- Carta principal -->
   <main class="readcard-main">
-    <article class="letter-card">
 
-      <!-- Franja decorativa superior -->
-      <div class="letter-card-stripe"></div>
+    <!-- Wrapper relativo para que el sello pueda sobresalir -->
+    <div class="letter-card-wrapper">
 
-      <!-- Sello / ícono central -->
+      <!-- Sello flotante — fuera del article para no ser cortado por overflow -->
       <div class="letter-seal-wrapper">
         <div class="letter-seal">
           <i data-lucide="mail-open" class="seal-icon"></i>
         </div>
       </div>
 
-      <!-- Título de la carta -->
-      <div class="letter-title-section">
-        <h1 class="letter-title" id="letter-title">Cargando carta...</h1>
-        <div class="letter-divider"></div>
+      <article class="letter-card">
+
+        <!-- Franja decorativa superior -->
+        <div class="letter-card-stripe"></div>
+
+        <!-- Título de la carta -->
+        <div class="letter-title-section">
+          <h1 class="letter-title" id="letter-title">Cargando carta...</h1>
+          <div class="letter-divider"></div>
+        </div>
+
+        <!-- Cuerpo de la carta -->
+        <div class="letter-body markdown-body" id="letter-content">
+        </div>
+
+        <!-- Pie de la carta -->
+        <footer class="letter-footer">
+          <span class="letter-footer-text">
+            <i data-lucide="shield-check" class="footer-icon"></i>
+            Carta entregada de forma segura
+          </span>
+        </footer>
+
+      </article>
+    </div>
+
+  </main>
+
+  <!-- DecryptionModal: modal para ingresar la clave de descifrado -->
+  <div id="decryption-modal" class="modal-overlay">
+    <div class="modal-card modal-card--sm">
+
+      <header class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="lock" class="icon-slate"></i>
+          <h2>Carta cifrada</h2>
+        </div>
+        <button class="btn-close-modal" id="close-decryption-modal-btn" aria-label="Cerrar modal de descifrado">
+          <i data-lucide="x" class="icon-slate"></i>
+        </button>
+      </header>
+
+      <div class="modal-content">
+        <p class="text-sm text-slate-500 mb-4">Esta carta está protegida con una clave. Ingresa la clave para descifrar y leer su contenido.</p>
+        <input
+          type="password"
+          id="decryption-key-input"
+          class="key-input-field"
+          placeholder="Clave secreta..."
+          autocomplete="off"
+        />
+        <p id="decryption-error" class="input-error-msg" style="display:none;">La clave proporcionada es incorrecta.</p>
       </div>
 
-      <!-- Cuerpo de la carta -->
-      <div class="letter-body markdown-body" id="letter-content">
-      </div>
-
-      <!-- Pie de la carta -->
-      <footer class="letter-footer">
-        <span class="letter-footer-text">
-          <i data-lucide="shield-check" class="footer-icon"></i>
-          Carta entregada de forma segura
-        </span>
+      <footer class="modal-footer">
+        <span></span>
+        <button class="btn-primary-modal" id="decrypt-btn">Descifrar</button>
       </footer>
 
-    </article>
-  </main>
+    </div>
+  </div>
 
 </div>
