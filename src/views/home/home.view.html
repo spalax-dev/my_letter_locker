@@ -1,13 +1,25 @@
-<div class="page_container">
-  <main class="editor-container">
+<div class="app-page">
+
+  <!-- Header compartido con branding -->
+  <header class="app-header">
+    <span class="app-brand">
+      <i data-lucide="file-text" class="brand-icon"></i>
+      Letter Locker
+    </span>
+    <span class="app-header-mode">Modo Edición</span>
+  </header>
+
+  <!-- Área del editor -->
+  <main class="editor-main">
     <div class="editor-meta">
-      <span class="meta-filename">Documento Letter Locker</span>
-      <span class="meta-mode">Modo Edición</span>
+      <span class="meta-filename">Documento sin título</span>
+      <span class="meta-wordcount" id="word-count">0 palabras</span>
     </div>
 
-    <textarea id="editor" class="editor-textarea" placeholder="# Empieza a escribir tu carta aquí..."></textarea>
+    <textarea id="editor" class="editor-textarea" placeholder="Empieza a escribir tu carta aquí..."></textarea>
   </main>
 
+  <!-- Barra de herramientas inferior -->
   <footer class="toolbar">
     <div class="toolbar-container">
 
@@ -24,36 +36,28 @@
       </div>
 
       <div class="toolbar-status">
-        <span>0 palabras</span>
         <span>UTF-8</span>
       </div>
 
     </div>
   </footer>
 
-  <!-- CONTENEDOR DEL MODAL (Fondo oscuro translúcido) -->
+  <!-- Modal de vista previa -->
   <div id="preview-modal" class="modal-overlay">
-
-    <!-- TARJETA DEL MODAL -->
     <div class="modal-card">
 
-      <!-- Encabezado del Modal -->
       <header class="modal-header">
         <div class="modal-title">
           <i data-lucide="eye" class="icon-slate"></i>
           <h2>Vista Previa</h2>
         </div>
-        <!-- Botón Cerrar -->
         <button class="btn-close-modal" aria-label="Cerrar vista previa">
           <i data-lucide="x" class="icon-slate"></i>
         </button>
       </header>
 
-      <!-- Contenido Interpretado (Markdown Renderizado) -->
-      <div class="modal-content markdown-body" id="preview-content">
-      </div>
+      <div class="modal-content markdown-body" id="preview-content"></div>
 
-      <!-- Pie del Modal (Opcional, para acciones rápidas) -->
       <footer class="modal-footer">
         <span class="text-xs text-slate-400">Modo lectura activo</span>
         <button class="btn-primary-modal" id="close-preview-btn">Cerrar</button>
@@ -61,4 +65,5 @@
 
     </div>
   </div>
+
 </div>
