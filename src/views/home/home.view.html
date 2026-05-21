@@ -1,56 +1,64 @@
-<style>
-  .container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 4em;
-    padding: 5em;
-    font-family: inter;
-
-    --gray: #e0e0e0c0;
-    --gray2: #eae8e8c0;
-  }
-
-  #inp {
-    border: 1px solid var(--gray);
-    box-shadow: 0px 2px 4px 0px var(--gray);
-    resize: none;
-    height: 30em;
-    padding: 1em;
-    font: inherit;
-  }
-
-  .preview-container {
-    box-shadow: 0px 2px 4px 0px var(--gray);
-    border: 1px solid var(--gray);
-  }
-
-  .preview-title {
-    font-weight: bold;
-    padding: 1em;
-    border: 1px solid var(--gray);
-    background-color: var(--gray2);
-  }
-
-  #preview {
-    height: 30em;
-    width: 100%;
-    height: 100%;
-    flex-shrink: 1;
-    flex-grow: 1;
-    padding: 1em;
-    white-space: pre-wrap; /* This preserves newlines and wraps text */
-
-  }
-
-</style>
-
-<div class="container">
-  <textarea name="" id="inp"></textarea>
-
-  <div class="preview-container" style="width: 100%; display: flex; flex-direction: column;">
-    <div class="preview-title">
-      Preview
+<div class="page_container">
+  <main class="editor-container">
+    <div class="editor-meta">
+      <span class="meta-filename">Documento Letter Locker</span>
+      <span class="meta-mode">Modo Edición</span>
     </div>
-    <div id="preview"></div>
+
+    <textarea id="editor" class="editor-textarea" placeholder="# Empieza a escribir tu carta aquí..."></textarea>
+  </main>
+
+  <footer class="toolbar">
+    <div class="toolbar-container">
+
+      <div class="toolbar-actions">
+        <button class="btn-utility" id="open-preview-btn">
+          <i data-lucide="eye" class="icon-slate"></i>
+          <span>Vista previa</span>
+        </button>
+
+        <button class="btn-utility">
+          <i data-lucide="terminal" class="icon-slate"></i>
+          <span>Comandos</span>
+        </button>
+      </div>
+
+      <div class="toolbar-status">
+        <span>0 palabras</span>
+        <span>UTF-8</span>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- CONTENEDOR DEL MODAL (Fondo oscuro translúcido) -->
+  <div id="preview-modal" class="modal-overlay">
+
+    <!-- TARJETA DEL MODAL -->
+    <div class="modal-card">
+
+      <!-- Encabezado del Modal -->
+      <header class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="eye" class="icon-slate"></i>
+          <h2>Vista Previa</h2>
+        </div>
+        <!-- Botón Cerrar -->
+        <button class="btn-close-modal" aria-label="Cerrar vista previa">
+          <i data-lucide="x" class="icon-slate"></i>
+        </button>
+      </header>
+
+      <!-- Contenido Interpretado (Markdown Renderizado) -->
+      <div class="modal-content markdown-body" id="preview-content">
+      </div>
+
+      <!-- Pie del Modal (Opcional, para acciones rápidas) -->
+      <footer class="modal-footer">
+        <span class="text-xs text-slate-400">Modo lectura activo</span>
+        <button class="btn-primary-modal" id="close-preview-btn">Cerrar</button>
+      </footer>
+
+    </div>
   </div>
 </div>

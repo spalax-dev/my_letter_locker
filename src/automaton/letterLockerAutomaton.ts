@@ -1,4 +1,4 @@
-import { BoldLetterCommand, ItalicCommand, type LetterLockerCommand } from "../commands/commands";
+import { BoldLetterCommand, CommandManager, CommandNotFoundError, ItalicCommand, TitleCommand, type LetterLockerCommand } from "../commands/commands";
 import { Automaton, TransitionDeclaration, StatusDeclaration } from "./automaton";
 
 // estado inicial leyendo texto plano
@@ -38,7 +38,7 @@ export class LetterLockerAutomaton extends Automaton {
     // con '$' pasa de leer el nombre del comando a leer su valor
     this.addTransition(TransitionDeclaration.of(Q1, '$', Q2));
     // con cualquier caracter que no sea '$' se queda leyendo el nombre
-    this.addTransition(TransitionDeclaration.of(Q1, /[a-zA-Z_ñÑ]/, Q1));
+    this.addTransition(TransitionDeclaration.of(Q1, /[^$]/, Q1));
     // con '$' pasa de leer el valor del comando a leer texto
     this.addTransition(TransitionDeclaration.of(Q2, '$', Q0));
     // con cualquier caracter que no sea '$' se queda leyendo el valor
@@ -51,7 +51,9 @@ export class LetterLockerAutomaton extends Automaton {
 
 export class LetterLockerPreviewer {
   readonly automaton: Automaton;
-  private commands: Map<string, LetterLockerCommand>;
+  // private commands: Map<string, LetterLockerCommand>;
+  private commands: CommandManager;
+
 
   // variables temporales utilizadas en el renderizado
   private commandName: string = '';
@@ -62,7 +64,8 @@ export class LetterLockerPreviewer {
    *
    */
   constructor() {
-    this.commands = new Map();
+    // this.commands = new Map();
+    this.commands = new CommandManager();
     this.automaton = new LetterLockerAutomaton();
 
     this.configureCommands();
@@ -70,12 +73,13 @@ export class LetterLockerPreviewer {
   }
 
   private configureCommands(): void {
-    this.commands.set(BoldLetterCommand.name, BoldLetterCommand.render);
-    this.commands.set(ItalicCommand.name, ItalicCommand.render);
+    this.commands.registerCommand(BoldLetterCommand.name, BoldLetterCommand.render);
+    this.commands.registerCommand(ItalicCommand.name, ItalicCommand.render);
+    this.commands.registerCommand(TitleCommand.name, TitleCommand.render);
   }
 
   /**
-   * @throws {UnrecognizedCommand} if a tiped command is not registered
+   * @throws {CommandNotFoundError} if a tiped command is not registered
    */
   private configureTransitionListeners() {
     // agregar texto plano directamente
@@ -90,23 +94,12 @@ export class LetterLockerPreviewer {
       if (n.id === Q2.id) {
         this.commandValue += t.newSymbol;
       } else if (n.id === Q0.id) { // fin del commando
-        // obtener el comando dado su nombre
-        const command = this.commands.get(this.commandName);
-
-        if (command === undefined) { // si el comando es invalido
-          const err = new UnrecognizedCommand(this.commandName);
-          this.commandName = ''
+        try {
+          this.htmlPreview += this.commands.callComand(this.commandName, this.commandValue);
+        } finally {
+          this.commandName = '';
           this.commandValue = '';
-          this.htmlPreview = '';
-
-          throw err;
-        } else { // si el comando coincide entonces obtener el renderizado y agregarlo a la vista previa
-          this.htmlPreview += command(this.commandValue);
         }
-
-        // limpiar temporales para el siguiente comando (si es que lo hay)
-        this.commandValue = '';
-        this.commandName = '';
       }
     })
   }
