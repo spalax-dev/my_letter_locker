@@ -1,45 +1,31 @@
-<div class="app-page">
+<div id="reader-page" class="reader-page">
 
-  <!-- Header compartido con branding -->
-  <header class="app-header">
-    <span class="app-brand">
-      <div class="app-logo">
-        <img src="/logo-light.svg" alt="Logo" class="h-6 w-auto dark:hidden">
-        <img src="/logo-dark.svg" alt="Logo" class="h-6 w-auto hidden dark:block">
+  <div class="reader-content">
+    <h1 id="letter-title" class="reader-title"></h1>
+    <div id="letter-content" class="reader-body"></div>
+  </div>
+
+</div>
+
+<div id="decryption-modal" class="reader-modal">
+  <div class="modal-centered">
+    <div class="modal-box">
+      <div class="modal-header-row">
+        <span class="modal-label">Carta cifrada</span>
       </div>
-    </span>
-    <span class="app-header-mode">
-      <button id="theme-toggle" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-        <svg id="sun-icon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-        </svg>
-        <svg id="moon-icon" class="w-5 h-5 block dark:hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-        </svg>
-      </button>
-    </span>
-  </header>
-
-  <!-- Contenido principal -->
-  <main class="reader-main">
-
-    <div class="reader-header">
-      <h1 class="reader-title">Cartas recibidas</h1>
-      <p class="reader-subtitle">Cartas que has descifrado en este dispositivo</p>
+      <p class="modal-description">Esta carta está protegida con una contraseña.</p>
+      <input
+        type="password"
+        id="decryption-key-input"
+        class="modal-input"
+        placeholder="Clave secreta..."
+        autocomplete="off"
+      />
+      <p id="decryption-error" class="modal-error" style="display:none;">Clave incorrecta.</p>
+      <div class="modal-actions">
+        <button class="modal-btn-cancel" id="close-decryption-modal-btn">Cancelar</button>
+        <button class="modal-btn-primary" id="decrypt-btn">Descifrar</button>
+      </div>
     </div>
-
-    <!-- Lista de cartas -->
-    <div id="history-list" class="history-list">
-      <!-- Se rellena dinámicamente -->
-    </div>
-
-    <!-- Estado vacío -->
-    <div id="history-empty" class="history-empty" style="display:none;">
-      <i data-lucide="inbox" class="history-empty-icon"></i>
-      <p class="history-empty-text">Aún no has leído ninguna carta</p>
-      <p class="history-empty-sub">Las cartas que descifres aparecerán aquí</p>
-    </div>
-
-  </main>
-
+  </div>
 </div>

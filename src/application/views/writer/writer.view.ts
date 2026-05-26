@@ -1,7 +1,7 @@
 import Handlebars from "handlebars";
 import type { View } from "../base.view";
 
-import templateContent from "./home.view.html?raw";
+import templateContent from "./writer.view.html?raw";
 
 import { createIcons, Eye, FileText, Terminal, X, Lock, Copy, Check, ExternalLink } from "lucide";
 import { encrypt, removePassCommand } from "../../../encryption/encryption.service";
@@ -16,7 +16,7 @@ import { EditorState } from '@codemirror/state';
 import { StateField, RangeSetBuilder, RangeSet } from '@codemirror/state';
 import { defaultKeymap, history, historyKeymap, indentWithTab } from '@codemirror/commands';
 
-export class HomeView implements View {
+export class WriterView implements View {
   private template = Handlebars.compile(templateContent);
   private editorView: EditorView | undefined;
   private commandMatcher = new CommandMatcher();
@@ -100,8 +100,8 @@ export class HomeView implements View {
               const text = update.state.doc.toString();
               const words = text.trim() ? text.trim().split(/\s+/).length : 0;
               const chars = text.length;
-              if (wordCountEl) wordCountEl.textContent = `${words} words`;
-              if (charCountEl) charCountEl.textContent = `${chars} characters`;
+              if (wordCountEl) wordCountEl.textContent = `${words} palabras`;
+              if (charCountEl) charCountEl.textContent = `${chars} caracteres`;
               this.hideEditorError();
               this.handleLineCommands(update.state);
             }
@@ -249,7 +249,7 @@ export class HomeView implements View {
     const editorText = this.getEditorText();
 
     if (!editorText.trim()) {
-      this.showEditorError('No content to encrypt.');
+      this.showEditorError('No hay contenido para cifrar.');
       return;
     }
 
@@ -291,7 +291,7 @@ export class HomeView implements View {
       this.openEncryptionModal(ciphertext);
     } catch (err) {
       console.error('Encryption error:', err);
-      this.showEditorError('Unexpected error while encrypting. Try again.');
+      this.showEditorError('Error inesperado al cifrar. Inténtalo de nuevo.');
     }
   }
 
@@ -315,7 +315,7 @@ export class HomeView implements View {
     const url = this.shareableUrl;
     try {
       await navigator.clipboard.writeText(url);
-      this.copyBtnLabel.textContent = 'Copied!';
+      this.copyBtnLabel.textContent = '¡Copiado!';
       this.copyCiphertextBtn.classList.add('btn-copied');
       setTimeout(() => {
         this.resetCopyButton();
@@ -326,7 +326,7 @@ export class HomeView implements View {
   }
 
   private resetCopyButton(): void {
-    this.copyBtnLabel.textContent = 'Copy link';
+    this.copyBtnLabel.textContent = 'Copiar enlace';
     this.copyCiphertextBtn.classList.remove('btn-copied');
   }
 
