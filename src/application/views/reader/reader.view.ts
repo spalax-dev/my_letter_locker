@@ -5,15 +5,19 @@ import Handlebars from "handlebars";
 import templateContent from "./reader.view.html?raw";
 import { decrypt, isCiphertext, WrongPassphraseError } from "../../../encryption/encryption.service";
 import { decompressFromUrlSafe } from "../../../utils/compression";
-import { addToHistory } from "../../../history/letter-history";
 
 export const LETTER_STORAGE_KEY = 'letterlocker:card';
 
 function resolveCardContent(): string | null {
   const params = new URLSearchParams(window.location.search);
-  const fromUrl = params.get('c');
-  if (fromUrl) {
-    return fromUrl;
+  const fromUrlCipher = params.get('c');
+  if (fromUrlCipher) {
+    return fromUrlCipher;
+  }
+
+  const fromUrlData = params.get('d');
+  if (fromUrlData) {
+    return decompressFromUrlSafe(fromUrlData);
   }
 
   const fromStorage = localStorage.getItem(LETTER_STORAGE_KEY);
@@ -125,7 +129,6 @@ export class ReaderView implements View {
     try {
       const compressed = await decrypt(this.currentCiphertext, passphrase);
       const plaintext = decompressFromUrlSafe(compressed);
-      addToHistory(this.currentCiphertext);
       this.closeDecryptionModal();
       this.readerPageEl!.style.display = 'flex';
       this.renderContent(plaintext);

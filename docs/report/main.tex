@@ -121,38 +121,38 @@ En las siguientes tablas se detallan los requisitos técnicos y funcionales del 
 
 % ==================================
 \section{Diseño e implementación}
-El desarrollo de \emph{My Letter Locker} se fundamenta en una arquitectura modular que separa claramente los componentes de procesamiento de texto, gestión de comandos, cifrado y visualización. Esta sección describe los patrones reconocidos mediante autómatas finitos, las tecnologías utilizadas y la estructura del proyecto.
+El desarrollo de \emph{My Letter Locker} se fundamenta en una arquitectura modular que separa claramente los componentes de análisis sintáctico, cifrado, compresión y visualización. Esta sección describe los patrones reconocidos mediante autómatas finitos, las tecnologías utilizadas, la estructura del proyecto y el diseño de la interfaz.
 
 \subsection{Patrones a identificar}
-La aplicación reconoce dos categorías de patrones mediante autómatas finitos implementados en TypeScript:
+La aplicación reconoce patrones mediante autómatas finitos implementados en TypeScript dentro del módulo \texttt{core/}. Cada autómata se acompaña de un alfabeto personalizado que define los símbolos válidos, y de un matcher que coordina su ejecución.
 
-\subsubsection{Comandos de formato y configuración}
-Los comandos siguen una sintaxis declarativa con delimitadores de dólar (\texttt{\$}). Un comando tiene la estructura \texttt{\$nombre\$valor\$} o \texttt{\$nombre:modificador\$valor\$}, donde:
-
-\begin{itemize}
-    \item \texttt{nombre} identifica el tipo de comando.
-    \item \texttt{modificador} (opcional) especifica parámetros adicionales.
-    \item \texttt{valor} contiene el contenido al que se aplica el comando.
-\end{itemize}
-
-Los comandos reconocidos incluyen:
+Un alfabeto define los caracteres reconocibles y las transiciones válidas entre estados, proporcionando una separación clara entre la lógica del autómata y los datos que procesa. Por ejemplo:
 
 \begin{itemize}
-    \item \texttt{\$bold\$texto\$} — Aplica negrita al texto.
-    \item \texttt{\$italic\$texto\$} — Aplica cursiva al texto.
-    \item \texttt{\$title:n\$texto\$} — Renderiza texto como encabezado de nivel $n$ (1 a 6).
-    \item \texttt{\$pass\$palabra\$} — Define la palabra secreta para el cifrado.
+    \item \texttt{CommandAlphabet} define métodos estáticos para identificar símbolos de inicio/final (\texttt{\$}), caracteres alfabéticos, dígitos y niveles de título.
+    \item \texttt{UrlAlphabet} define la validación de esquemas de URL, reconociendoprefijos como \texttt{http://}, \texttt{https://} y \texttt{www.}, además de caracteres válidos en URLs (alfanuméricos, guiones, puntos, двоеточие, barras, etc.).
 \end{itemize}
 
-El autómata que reconoce estos patrones utiliza tres estados:
+\subsubsection{Comandos de formato}
+Los comandos siguen una sintaxis declarativa con delimitadores de dólar (\texttt{\$}). Se distinguen dos tipos:
 
 \begin{itemize}
-    \item \textbf{Q0 (Texto plano):} Estado inicial. Copia los caracteres al resultado hasta encontrar el primer \texttt{\$}.
-    \item \textbf{Q1 (Nombre del comando):} Acumula caracteres del nombre del comando hasta el siguiente \texttt{\$}.
-    \item \textbf{Q2 (Valor del comando):} Acumula el valor hasta encontrar el delimitador final \texttt{\$}, momento en que ejecuta el comando correspondiente.
+    \item \textbf{Comandos inline:} Se aplican al texto seleccionado (negrita, cursiva).
+    \item \textbf{Comandos de línea:} Se colocan al inicio de una línea y aplican formato al contenido siguiente (títulos).
 \end{itemize}
 
-La Figura~\ref{fig:automata-comandos} ilustra el diagrama de estados del autómata reconocedor.
+Estructura: \texttt{\$nombre\$valor\$} o \texttt{\$nombre:modificador\$valor\$}.
+
+Comandos reconocidos:
+
+\begin{itemize}
+    \item \texttt{\$bold\$texto\$} — Aplica negrita.
+    \item \texttt{\$italic\$texto\$} — Aplica cursiva.
+    \item \texttt{\$title\$ texto} — Encabezado nivel 1.
+    \item \texttt{\$title:n\$ texto} — Encabezado nivel $n$ (2 a 6).
+\end{itemize}
+
+El autómata reconocedor de comandos utiliza cuatro estados (Q0, Q1, Q2, Q3) para manejar tanto comandos inline como de línea, diferenciando la sintaxis según el contexto. La Figura~\ref{fig:automata-comandos} ilustra el diagrama de estados.
 
 \begin{figure}[H]
     \centering
@@ -162,17 +162,18 @@ La Figura~\ref{fig:automata-comandos} ilustra el diagrama de estados del autóma
 \end{figure}
 
 \subsubsection{Datos estructurados}
-Para validar campos de entrada se emplean autómatas finitos que verifican el formato de:
+Los matchers de datos emplean autómatas específicos para validar:
 
 \begin{itemize}
-    \item \textbf{Correos electrónicos:} Formato \texttt{usuario@dominio.ext}.
-    \item \textbf{URLs:} Protocolo opcional seguido de dominio y ruta.
-    \item \textbf{Fechas:} Formato ISO~8601 (AAAA-MM-DD).
-    \item \textbf{Títulos:} Cadenas no vacías con longitud máxima de 100 caracteres.
+    \item \textbf{EmailMatcher:} Direcciones de correo electrónico.
+    \item \textbf{UrlMatcher:} URLs con protocolo opcional.
+    \item \textbf{NewlineMatcher y TabMatcher:} Caracteres especiales de formato de texto.
 \end{itemize}
 
+Estos matchers permiten el resaltado sintáctico en tiempo real dentro del editor, mejorando la experiencia del usuario.
+
 \subsection{Tecnologías y herramientas seleccionadas}
-La pila tecnológica del proyecto prioriza la simplicidad y la portabilidad:
+La pila tecnológica prioriza la simplicidad, el tipado estático y la eliminación de dependencias innecesarias:
 
 \begin{table}[H]
     \centering
@@ -180,74 +181,78 @@ La pila tecnológica del proyecto prioriza la simplicidad y la portabilidad:
         \toprule
         \textbf{Tecnología} & \textbf{Uso en el proyecto} \\
         \midrule
-        TypeScript & Lenguaje principal, tipado estático para mayor robustez \\
+        TypeScript & Lenguaje principal con tipado estático \\
         Vite & Bundler y servidor de desarrollo \\
-        Web Crypto API & Cifrado AES-GCM y derivación de claves PBKDF2 \\
-        Pako & Biblioteca de compresión gzip para JavaScript \\
-        HTML5/CSS3 & Interfaz de usuario \\
+        Tailwind CSS v4 & Estilos con utilidades CSS \\
+        Navigo & Enrutamiento SPA basado en hash \\
+        Handlebars & Motor de plantillas para vistas HTML \\
+        CodeMirror 6 & Editor de texto enriquecido \\
+        Lucide & Iconos SVG para la interfaz \\
+        Pako & Compresión gzip para permitir hasta 60\,000 caracteres \\
+        Web Crypto API & Cifrado AES-GCM y derivación PBKDF2 \\
         \bottomrule
     \end{tabularx}
 \end{table}
 
-Se optó por Web Crypto API nativa del navegador en lugar de bibliotecas externas de criptografía, lo que elimina dependencias y reduce el tamaño del bundle.
+Se utilizó Web Crypto API nativa del navegador para criptografía, evitando bibliotecas externas. El uso de Tailwind CSS permite un desarrollo rápido de estilos sin archivos CSS adicionales.
 
 \subsection{Estructura del proyecto}
-El código fuente se organiza en módulos funcionales dentro del directorio \texttt{src/}:
+El código fuente se organiza en módulos funcionales dentro de \texttt{src/}:
 
 \begin{itemize}
-    \item \texttt{automaton/} — Implementación del autómata genérico y el reconocedor de comandos.
-    \item \texttt{commands/} — Definición y registro de comandos de formato.
+    \item \texttt{application/} — Punto de entrada, rutas y vistas principales (Writer, Reader).
+    \item \texttt{core/} — Motor de autómatas y matchers:
+        \begin{itemize}
+            \item \texttt{automaton/} — Clase base genérica y tipos compartidos.
+            \item \texttt{matchers/} — Matchers específicos: command, email, url, newline, tab.
+            \item \texttt{analyzer/} — Análisis implícito del contenido.
+            \item \texttt{previewer/} — Previsualización del documento renderizado.
+        \end{itemize}
     \item \texttt{encryption/} — Servicio de cifrado y descifrado.
-    \item \texttt{routing/} — Sistema de enrutamiento de vistas.
-    \item \texttt{views/} — Componentes de interfaz (home, reader, readcard).
+    \item \texttt{utils/} — Utilidades: compresión gzip.
+    \item \texttt{history/} — Historial de navegación.
 \end{itemize}
 
-\subsection{Componentes principales}
-
-\subsubsection{Clase Automaton}
-La clase \texttt{Automaton} proporciona la lógica base para el reconocimiento de patrones. Sus componentes principales son:
+\subsection{Diseño de interfaz}
+La aplicación se divide en dos vistas principales:
 
 \begin{itemize}
-    \item \textbf{Estados:} Representados mediante \texttt{StatusDeclaration}.
-    \item \textbf{Transiciones:} Definidas por \texttt{TransitionDeclaration} con símbolo (string o expresión regular) y estado destino.
-    \item \textbf{Ejecución:} El método \texttt{run(cadena)} procesa la entrada símbolo a símbolo, lanzando error si no existe transición válida.
-    \item \textbf{Callbacks:} Permiten ejecutar acciones al atravesar una transición (\texttt{onTransition}).
+    \item \textbf{Writer (\texttt{/}):} Vista de redacción. Incluye editor de texto enriquecido con soporte para comandos, barra de herramientas de formato (negrita, cursiva, títulos), campo para palabra secreta, y opciones de compartición (copiar enlace, WhatsApp, correo electrónico).
+    
+    La Figura~\ref{fig:mockup-writer} muestra el diseño de la interfaz de escritura.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[height=8cm]{mockup-writer.png}
+        \caption{Mockup de la interfaz Writer}
+        \label{fig:mockup-writer}
+    \end{figure}
+
+    \item \textbf{Reader (\texttt{/read}):} Vista de lectura. Solicita la palabra secreta al destinatario, descifra el contenido y lo renderiza con formato HTML. Si el cifrado está deshabilitado, permite lectura directa del enlace.
+
+    La Figura~\ref{fig:mockup-reader} muestra el diseño de la interfaz de lectura.
+
+    \begin{figure}[H]
+        \centering
+        \includegraphics[height=8cm]{mockup-reader.png}
+        \caption{Mockup de la interfaz Reader}
+        \label{fig:mockup-reader}
+    \end{figure}
 \end{itemize}
 
-\subsubsection{LetterLockerPreviewer}
-Esta clase coordina el autómata con el \texttt{CommandManager}:
-
-\begin{enumerate}
-    \item El autómata procesa el texto carácter a carácter.
-    \item Al encontrar un comando completo (estado Q2 $\rightarrow$ Q0), invoca el comando correspondiente.
-    \item El resultado HTML se concatena al resultado final.
-    \item Si se detecta \texttt{\$pass\$}, se extrae y almacena la palabra secreta.
-\end{enumerate}
+La navegación entre vistas se gestiona mediante Navigo, manteniendo la arquitectura de aplicación de página única (SPA). El sistema soporta modo claro y oscuro, persistido en el almacenamiento local del navegador.
 
 \subsection{Algoritmo de cifrado y compresión}
-El sistema implementa un flujo de procesamiento que combina compresión y cifrado para permitir cartas de hasta 60\,000 caracteres:
+El flujo de procesamiento combina compresión y cifrado para permitir cartas de hasta 60\,000 caracteres:
 
 \begin{enumerate}
-    \item \textbf{Compresión:} El texto plano se comprime mediante el algoritmo gzip utilizando la biblioteca Pako. Esta compresión reduce significativamente el tamaño del contenido antes del cifrado.
-    \item \textbf{Derivación de clave:} PBKDF2 con 100\,000 iteraciones y SHA-256 deriva una clave AES de 256 bits a partir de la palabra secreta.
+    \item \textbf{Compresión:} El texto plano se comprime mediante gzip (biblioteca Pako), reduciendo significativamente el tamaño antes del cifrado.
+    \item \textbf{Derivación de clave:} PBKDF2 con 100\,000 iteraciones y SHA-256 deriva una clave AES-256 a partir de la palabra secreta.
     \item \textbf{Cifrado:} AES-GCM con vector de inicialización aleatorio proporciona cifrado autenticado.
     \item \textbf{Formato de salida:} Base64url de \texttt{[salt (16 bytes) | iv (12 bytes) | ciphertext]}.
 \end{enumerate}
 
-El flujo inverso (descifrado) invierte estos pasos: descifrar, descomprimir y procesar los comandos de formato.
-
-El formato Base64url (sin padding y con caracteres URL-safe) permite embeber el texto cifrado directamente en la URL.
-
-\subsection{Diseño de interfaz e interacción}
-La aplicación presenta tres vistas principales:
-
-\begin{itemize}
-    \item \textbf{Home (\texttt{/}):} Formulario de creación de carta. Incluye editor de texto con soporte para comandos, campo de palabra secreta, y botón para generar el enlace cifrado.
-    \item \textbf{Reader (\texttt{/read}):} Página de lectura. Solicita la palabra secreta al usuario y, si es correcta, muestra el contenido descifrado.
-    \item \textbf{ReadCard (\texttt{/read/card}):} Vista final que renderiza la carta con formato HTML.
-\end{itemize}
-
-La navegación entre vistas se gestiona mediante un sistema de enrutamiento basado en el hash de la URL, manteniendo la arquitectura de aplicación de página única (SPA).
+El flujo inverso (descifrado) invierte estos pasos: descifrar, descomprimir y procesar los comandos de formato mediante los autómatas reconocedores.
 
 
 % ==================================

@@ -1,3 +1,12 @@
+html {
+  font-size: 16px;
+}
+
+body {
+  font-family: 'Source Sans 3', sans-serif;
+  font-size: 1rem;
+}
+
 @import "tailwindcss";
 @import "./views/writer/writer.css";
 @import "./views/reader/reader.css";
@@ -23,7 +32,17 @@
 
 .app-brand {
   display: inline-flex;
-  @apply flex items-center gap-2 text-sm font-semibold tracking-widest uppercase text-primary;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.brand-title {
+  font-family: 'Architects Daughter', cursive;
+  font-size: 0.875rem;
+  font-weight: 400;
+  letter-spacing: 0.01em;
+  color: var(--color-primary);
+  vertical-align: middle;
 }
 
 .brand-icon {
@@ -65,7 +84,7 @@
 
 .modal-card {
   background-color: #FFFFFF;
-  @apply max-w-lg w-full rounded-xl shadow-2xl flex flex-col overflow-hidden;
+  @apply max-w-lg w-full rounded-xl shadow-2xl flex flex-col overflow-hidden max-h-[85vh];
 }
 
 .dark .modal-card {
@@ -73,11 +92,11 @@
 }
 
 .modal-card--sm {
-  @apply max-w-md h-auto;
+  @apply max-w-sm h-auto;
 }
 
 .key-input-field {
-  @apply w-full px-3 py-2 text-sm text-text bg-primary-light border border-primary/10 rounded-lg shadow-sm placeholder-text-muted focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-colors duration-200;
+  @apply w-full px-3 py-2 text-base text-text bg-transparent border border-[var(--color-border-strong)] rounded text-text placeholder-text-muted focus:outline-none focus:border-primary transition-colors duration-200;
 }
 
 .ciphertext-textarea {

@@ -3,7 +3,7 @@ import type { View } from "../base.view";
 
 import templateContent from "./writer.view.html?raw";
 
-import { createIcons, Eye, FileText, Terminal, X, Lock, Copy, Check, ExternalLink } from "lucide";
+import { createIcons, X, MessageCircle, Mail, Copy, Share2, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6 } from "lucide";
 import { encrypt, removePassCommand } from "../../../encryption/encryption.service";
 import { compressToUrlSafe } from "../../../utils/compression";
 import { CommandMatcher } from "../../../core/matchers/command/CommandMatcher";
@@ -23,25 +23,19 @@ export class WriterView implements View {
   private urlMatcher = new UrlMatcher();
   private emailMatcher = new EmailMatcher();
 
-  private keyInputModal!: HTMLDivElement;
-  private keyInput!: HTMLInputElement;
-  private keyInputError!: HTMLParagraphElement;
-  private confirmKeyBtn!: HTMLButtonElement;
-  private closeKeyModalBtn!: HTMLButtonElement;
+  private shareModal!: HTMLDivElement;
+  private encryptionToggle!: HTMLInputElement;
+  private shareKeyInput!: HTMLInputElement;
+  private shareKeyError!: HTMLParagraphElement;
+  private shareCopyLabel!: HTMLSpanElement;
+  private shareBtn!: HTMLButtonElement;
+  private shareWhatsAppBtn!: HTMLAnchorElement;
+  private shareEmailBtn!: HTMLAnchorElement;
+  private shareCopyBtn!: HTMLAnchorElement;
 
-  private encryptionModal!: HTMLDivElement;
-  private ciphertextOutput!: HTMLTextAreaElement;
-  private copyCiphertextBtn!: HTMLButtonElement;
-  private copyBtnLabel!: HTMLSpanElement;
-  private closeEncryptionBtn!: HTMLButtonElement;
-  private closeEncryptionModalBtn!: HTMLButtonElement;
-  private readCardLinkBtn!: HTMLButtonElement;
-
-  private encryptBtn!: HTMLButtonElement;
+  private isEncryptionEnabled: boolean = true;
 
   private editorErrorMsg!: HTMLParagraphElement;
-
-  private shareableUrl: string = '';
 
   private lineCommandsCommitted = new Set<number>();
 
@@ -67,23 +61,60 @@ export class WriterView implements View {
     const wordCountEl = document.getElementById('word-count');
     const charCountEl = document.getElementById('char-count');
 
-    this.keyInputModal = document.getElementById('key-input-modal') as HTMLDivElement;
-    this.keyInput = document.getElementById('key-input') as HTMLInputElement;
-    this.keyInputError = document.getElementById('key-input-error') as HTMLParagraphElement;
-    this.confirmKeyBtn = document.getElementById('confirm-key-btn') as HTMLButtonElement;
-    this.closeKeyModalBtn = document.getElementById('close-key-modal-btn') as HTMLButtonElement;
-
-    this.encryptionModal = document.getElementById('encryption-modal') as HTMLDivElement;
-    this.ciphertextOutput = document.getElementById('ciphertext-output') as HTMLTextAreaElement;
-    this.copyCiphertextBtn = document.getElementById('copy-ciphertext-btn') as HTMLButtonElement;
-    this.copyBtnLabel = document.getElementById('copy-btn-label') as HTMLSpanElement;
-    this.closeEncryptionBtn = document.getElementById('close-encryption-btn') as HTMLButtonElement;
-    this.closeEncryptionModalBtn = document.getElementById('close-encryption-modal-btn') as HTMLButtonElement;
-    this.readCardLinkBtn = document.getElementById('read-card-link-btn') as HTMLButtonElement;
-
-    this.encryptBtn = document.getElementById('encrypt-btn') as HTMLButtonElement;
+    this.shareModal = document.getElementById('share-modal') as HTMLDivElement;
+    this.encryptionToggle = document.getElementById('encryption-toggle') as HTMLInputElement;
+    this.shareKeyInput = document.getElementById('share-key-input') as HTMLInputElement;
+    this.shareKeyError = document.getElementById('share-key-error') as HTMLParagraphElement;
+    this.shareCopyLabel = document.getElementById('share-copy-label') as HTMLSpanElement;
+    this.shareBtn = document.getElementById('share-btn') as HTMLButtonElement;
+    this.shareWhatsAppBtn = document.getElementById('share-whatsapp-btn') as HTMLAnchorElement;
+    this.shareEmailBtn = document.getElementById('share-email-btn') as HTMLAnchorElement;
+    this.shareCopyBtn = document.getElementById('share-copy-btn') as HTMLAnchorElement;
 
     this.editorErrorMsg = document.getElementById('editor-error-msg') as HTMLParagraphElement;
+
+    this.isEncryptionEnabled = !this.encryptionToggle?.checked ? false : true;
+
+    this.updatePasswordInputState();
+    this.updateShareButtonsState();
+
+    if (this.encryptionToggle) {
+      this.encryptionToggle.addEventListener('change', () => {
+        this.isEncryptionEnabled = this.encryptionToggle.checked;
+        this.updatePasswordInputState();
+        this.updateShareButtonsState();
+      });
+    }
+
+    this.shareKeyInput.addEventListener('input', () => {
+      this.updateShareButtonsState();
+    });
+
+    this.shareWhatsAppBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.handleShareWhatsApp();
+    });
+
+    this.shareEmailBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.handleShareEmail();
+    });
+
+    this.shareCopyBtn.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.handleShareCopy();
+    });
+
+    const dockBoldBtn = document.getElementById('dock-bold');
+    const dockItalicBtn = document.getElementById('dock-italic');
+
+    dockBoldBtn?.addEventListener('click', () => {
+      this.formatBold();
+    });
+
+    dockItalicBtn?.addEventListener('click', () => {
+      this.formatItalic();
+    });
 
     this.editorView = new EditorView({
       state: EditorState.create({
@@ -100,8 +131,8 @@ export class WriterView implements View {
               const text = update.state.doc.toString();
               const words = text.trim() ? text.trim().split(/\s+/).length : 0;
               const chars = text.length;
-              if (wordCountEl) wordCountEl.textContent = `${words} palabras`;
-              if (charCountEl) charCountEl.textContent = `${chars} caracteres`;
+              if (wordCountEl) wordCountEl.textContent = `${words}p`;
+              if (charCountEl) charCountEl.textContent = `${chars}c`;
               this.hideEditorError();
               this.handleLineCommands(update.state);
             }
@@ -114,46 +145,59 @@ export class WriterView implements View {
     this.editorView.focus();
 
     document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('#share-modal') || target.closest('#share-key-input')) {
+        return;
+      }
       if (this.editorView && !this.editorView.dom.contains(e.target as Node)) {
         this.editorView.focus();
       }
     });
 
-    this.encryptBtn.addEventListener('click', () => {
-      this.handleEncryptClick();
+    this.shareBtn.addEventListener('click', () => {
+      this.openShareModal();
     });
 
-    this.closeKeyModalBtn.addEventListener('click', () => {
-      this.closeKeyModal();
-    });
-
-    this.confirmKeyBtn.addEventListener('click', () => {
-      this.handleConfirmKey();
-    });
-
-    this.keyInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') {
-        this.handleConfirmKey();
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && this.shareModal.classList.contains('is-active')) {
+        this.shareModal.classList.remove('is-active');
       }
     });
 
-    this.copyCiphertextBtn.addEventListener('click', () => {
-      this.handleCopyCiphertext();
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.id === 'share-modal') {
+        this.shareModal.classList.remove('is-active');
+      }
     });
 
-    this.readCardLinkBtn.addEventListener('click', () => {
-      this.handleOpenReadCard();
+    const dockTitleBtn = document.getElementById('dock-title');
+    const headingSubmenu = document.getElementById('heading-submenu');
+
+    dockTitleBtn?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      headingSubmenu?.classList.toggle('is-open');
     });
 
-    this.closeEncryptionBtn.addEventListener('click', () => {
-      this.closeEncryptionModal();
+    headingSubmenu?.querySelectorAll('.heading-submenu-item').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const target = e.currentTarget as HTMLElement;
+        const level = target.dataset.level;
+        if (level) {
+          this.formatLineCommand(level);
+        }
+        headingSubmenu.classList.remove('is-open');
+      });
     });
 
-    this.closeEncryptionModalBtn.addEventListener('click', () => {
-      this.closeEncryptionModal();
+    document.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (!target.closest('.dock-heading-dropdown')) {
+        headingSubmenu?.classList.remove('is-open');
+      }
     });
 
-    createIcons({ icons: { Eye, FileText, Terminal, X, Lock, Copy, Check, ExternalLink } });
+    createIcons({ icons: { X, MessageCircle, Mail, Copy, Share2, Heading, Heading1, Heading2, Heading3, Heading4, Heading5, Heading6 } });
   }
 
   private commandDecorations() {
@@ -245,89 +289,148 @@ export class WriterView implements View {
     return this.editorView?.state.doc.toString() || '';
   }
 
-  private handleEncryptClick(): void {
+  private openShareModal(): void {
+    this.shareKeyInput.value = '';
+    this.shareKeyError.style.display = 'none';
+    this.shareCopyLabel.textContent = '';
+    this.updatePasswordInputState();
+    this.updateShareButtonsState();
+    this.shareModal.classList.add('is-active');
+    setTimeout(() => {
+      if (this.isEncryptionEnabled) {
+        this.shareKeyInput.focus();
+      }
+    }, 50);
+  }
+
+  private updatePasswordInputState(): void {
+    if (this.isEncryptionEnabled) {
+      this.shareKeyInput.removeAttribute('disabled');
+    } else {
+      this.shareKeyInput.setAttribute('disabled', 'true');
+    }
+  }
+
+  private updateShareButtonsState(): void {
+    const passphrase = this.shareKeyInput?.value || '';
+    const isDisabled = this.isEncryptionEnabled && !passphrase.trim();
+    
+    if (this.shareWhatsAppBtn) {
+      this.shareWhatsAppBtn.style.pointerEvents = isDisabled ? 'none' : 'auto';
+      this.shareWhatsAppBtn.style.opacity = isDisabled ? '0.5' : '1';
+    }
+    if (this.shareEmailBtn) {
+      this.shareEmailBtn.style.pointerEvents = isDisabled ? 'none' : 'auto';
+      this.shareEmailBtn.style.opacity = isDisabled ? '0.5' : '1';
+    }
+    if (this.shareCopyBtn) {
+      this.shareCopyBtn.style.pointerEvents = isDisabled ? 'none' : 'auto';
+      this.shareCopyBtn.style.opacity = isDisabled ? '0.5' : '1';
+    }
+    
+    if (this.shareKeyInput) {
+      if (this.isEncryptionEnabled) {
+        this.shareKeyInput.removeAttribute('disabled');
+        this.shareKeyInput.classList.toggle('input-disabled', !passphrase.trim());
+      } else {
+        this.shareKeyInput.setAttribute('disabled', 'true');
+        this.shareKeyInput.classList.remove('input-disabled');
+      }
+    }
+  }
+
+  private async generateShareableUrl(): Promise<string> {
     const editorText = this.getEditorText();
 
     if (!editorText.trim()) {
-      this.showEditorError('No hay contenido para cifrar.');
-      return;
+      throw new Error('No hay contenido para compartir.');
     }
 
-    removePassCommand(editorText);
-    this.openKeyModal();
-  }
-
-  private openKeyModal(): void {
-    this.keyInput.value = '';
-    this.hideKeyInputError();
-    this.keyInputModal.classList.add('is-active');
-    setTimeout(() => this.keyInput.focus(), 50);
-  }
-
-  private closeKeyModal(): void {
-    this.keyInputModal.classList.remove('is-active');
-    this.hideKeyInputError();
-  }
-
-  private handleConfirmKey(): void {
-    const passphrase = this.keyInput.value;
-
-    if (!passphrase) {
-      this.showKeyInputError();
-      return;
-    }
-
-    this.closeKeyModal();
-    this.runEncryption(passphrase);
-  }
-
-  private async runEncryption(passphrase: string): Promise<void> {
-    const editorText = this.getEditorText();
     const plaintext = removePassCommand(editorText);
+    const origin = window.location.origin;
+
+    if (!this.isEncryptionEnabled) {
+      const compressed = compressToUrlSafe(plaintext);
+      return origin + '/read?d=' + encodeURIComponent(compressed);
+    }
+
+    const passphrase = this.shareKeyInput.value;
+    if (!passphrase) {
+      throw new Error('La palabra secreta no puede estar vacía.');
+    }
+
+    const compressed = compressToUrlSafe(plaintext);
+    const ciphertext = await encrypt(compressed, passphrase);
+    return origin + '/read?c=' + encodeURIComponent(ciphertext);
+  }
+
+  private async handleShareWhatsApp(): Promise<void> {
+    const passphrase = this.shareKeyInput.value;
+    if (this.isEncryptionEnabled && !passphrase) {
+      this.shareKeyError.style.display = 'block';
+      return;
+    }
 
     try {
-      const compressed = compressToUrlSafe(plaintext);
-      const ciphertext = await encrypt(compressed, passphrase);
-      this.openEncryptionModal(ciphertext);
+      const link = await this.generateShareableUrl();
+      const message = `Hola!, Te comparto esta carta: ${link}`;
+      const whatsappUrl = `https://wa.me/?text=${encodeURIComponent(message)}`;
+      window.open(whatsappUrl, '_blank', 'noopener,noreferrer');
     } catch (err) {
-      console.error('Encryption error:', err);
-      this.showEditorError('Error inesperado al cifrar. Inténtalo de nuevo.');
+      if (err instanceof Error && err.message === 'No hay contenido para compartir.') {
+        this.showEditorError(err.message);
+        this.shareModal.classList.remove('is-active');
+      } else {
+        console.error('Share error:', err);
+      }
     }
   }
 
-  private openEncryptionModal(ciphertext: string): void {
-    this.shareableUrl = window.location.origin + '/read/card?c=' + encodeURIComponent(ciphertext);
+  private async handleShareEmail(): Promise<void> {
+    const passphrase = this.shareKeyInput.value;
+    if (this.isEncryptionEnabled && !passphrase) {
+      this.shareKeyError.style.display = 'block';
+      return;
+    }
 
-    this.ciphertextOutput.value = this.shareableUrl;
-    this.resetCopyButton();
-    this.encryptionModal.classList.add('is-active');
-  }
-
-  private closeEncryptionModal(): void {
-    this.encryptionModal.classList.remove('is-active');
-  }
-
-  private handleOpenReadCard(): void {
-    window.open(this.shareableUrl, '_blank');
-  }
-
-  private async handleCopyCiphertext(): Promise<void> {
-    const url = this.shareableUrl;
     try {
-      await navigator.clipboard.writeText(url);
-      this.copyBtnLabel.textContent = '¡Copiado!';
-      this.copyCiphertextBtn.classList.add('btn-copied');
+      const link = await this.generateShareableUrl();
+      const subject = 'Carta compartida';
+      const body = `Hola!, Te comparto esta carta: ${link}`;
+      const mailtoUrl = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+      window.open(mailtoUrl, '_blank');
+    } catch (err) {
+      if (err instanceof Error && err.message === 'No hay contenido para compartir.') {
+        this.showEditorError(err.message);
+        this.shareModal.classList.remove('is-active');
+      } else {
+        console.error('Share error:', err);
+      }
+    }
+  }
+
+  private async handleShareCopy(): Promise<void> {
+    const passphrase = this.shareKeyInput.value;
+    if (this.isEncryptionEnabled && !passphrase) {
+      this.shareKeyError.style.display = 'block';
+      return;
+    }
+
+    try {
+      const link = await this.generateShareableUrl();
+      await navigator.clipboard.writeText(link);
+      this.shareCopyLabel.textContent = '¡Copiado!';
       setTimeout(() => {
-        this.resetCopyButton();
+        this.shareCopyLabel.textContent = '';
       }, 1500);
     } catch (err) {
-      console.error('Failed to copy to clipboard:', err);
+      if (err instanceof Error && err.message === 'No hay contenido para compartir.') {
+        this.showEditorError(err.message);
+        this.shareModal.classList.remove('is-active');
+      } else {
+        console.error('Share error:', err);
+      }
     }
-  }
-
-  private resetCopyButton(): void {
-    this.copyBtnLabel.textContent = 'Copiar enlace';
-    this.copyCiphertextBtn.classList.remove('btn-copied');
   }
 
   private showEditorError(message: string): void {
@@ -340,11 +443,65 @@ export class WriterView implements View {
     this.editorErrorMsg.textContent = '';
   }
 
-  private showKeyInputError(): void {
-    this.keyInputError.style.display = 'block';
+  public formatBold(): void {
+    if (!this.editorView) return;
+    const selection = this.editorView.state.selection.main;
+    const selectedText = this.editorView.state.sliceDoc(selection.from, selection.to);
+
+    if (selectedText) {
+      this.editorView.dispatch({
+        changes: { from: selection.from, to: selection.to, insert: `$bold$${selectedText}$` }
+      });
+    } else {
+      this.editorView.dispatch({
+        changes: { from: selection.from, insert: '$bold$$' }
+      });
+      this.editorView.dispatch({
+        selection: { anchor: selection.from + 6 }
+      });
+    }
   }
 
-  private hideKeyInputError(): void {
-    this.keyInputError.style.display = 'none';
+  public formatItalic(): void {
+    if (!this.editorView) return;
+    const selection = this.editorView.state.selection.main;
+    const selectedText = this.editorView.state.sliceDoc(selection.from, selection.to);
+
+    if (selectedText) {
+      this.editorView.dispatch({
+        changes: { from: selection.from, to: selection.to, insert: `$italic$${selectedText}$` }
+      });
+    } else {
+      this.editorView.dispatch({
+        changes: { from: selection.from, insert: '$italic$$' }
+      });
+      this.editorView.dispatch({
+        selection: { anchor: selection.from + 8 }
+      });
+    }
+  }
+
+  public formatLineCommand(level: string): void {
+    if (!this.editorView) return;
+    const selection = this.editorView.state.selection.main;
+    const currentLine = this.editorView.state.doc.lineAt(selection.from);
+    const lineText = currentLine.text;
+
+    const titleRegex = /^\$title(?::\d+)?\$\n?/;
+    const match = lineText.match(titleRegex);
+
+    if (match) {
+      this.editorView.dispatch({
+        changes: { from: currentLine.from, to: currentLine.from + match[0].length, insert: '' }
+      });
+    } else {
+      const insertedText = level === "1" ? `$title$ ` : `$title:${level}$ `;
+      this.editorView.dispatch({
+        changes: { from: currentLine.from, insert: insertedText }
+      });
+      this.editorView.dispatch({
+        selection: { anchor: currentLine.from + insertedText.length }
+      });
+    }
   }
 }

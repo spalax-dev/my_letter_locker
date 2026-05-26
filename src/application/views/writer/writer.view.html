@@ -4,11 +4,16 @@
   <header class="app-header">
     <span class="app-brand">
       <div class="app-logo">
-        <img src="/logo-light.svg" alt="Logo" class="h-6 w-auto dark:hidden">
-        <img src="/logo-dark.svg" alt="Logo" class="h-6 w-auto hidden dark:block">
+        <img src="/logo-light.svg" alt="Logo" class="h-4 w-auto dark:hidden">
+        <img src="/logo-dark.svg" alt="Logo" class="h-4 w-auto hidden dark:block">
       </div>
+      <span class="brand-title">My Letter Locker</span>
     </span>
-    <span class="app-header-mode">
+    <div class="flex items-center gap-3">
+      <button id="share-btn" class="app-header-nav">
+        <i data-lucide="share-2" class="icon-slate"></i>
+        <span>Compartir</span>
+      </button>
       <button id="theme-toggle" class="p-2 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
         <svg id="sun-icon" class="w-5 h-5 hidden dark:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
@@ -17,15 +22,40 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
         </svg>
       </button>
-    </span>
+    </div>
   </header>
   <main class="editor-main">
-    <div class="editor-meta">
-      
-      <div class="meta-counts">
-        <span class="meta-charcount" id="char-count">0 caracteres</span>
-        <span class="meta-divider">·</span>
-        <span class="meta-wordcount" id="word-count">0 palabras</span>
+    <div class="editor-dock">
+      <div class="dock-content">
+        <div class="dock-group">
+          <button class="dock-btn" id="dock-bold" title="Negreta">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M6 4h8a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/><path d="M6 12h9a4 4 0 0 1 4 4 4 4 0 0 1-4 4H6z"/></svg>
+          </button>
+          <button class="dock-btn" id="dock-italic" title="Cursiva">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" x2="10" y1="4" y2="4"/><line x1="14" x2="5" y1="20" y2="20"/><line x1="15" x2="9" y1="4" y2="20"/></svg>
+          </button>
+          <div class="dock-heading-dropdown">
+            <button class="dock-btn" id="dock-title" title="Título">
+              <i data-lucide="heading"></i>
+            </button>
+            <div class="heading-submenu" id="heading-submenu">
+              <button class="heading-submenu-item" data-level="1">
+                <span class="heading-preview" style="font-size: 1.75rem; font-weight: bold;">Título 1</span>
+              </button>
+              <button class="heading-submenu-item" data-level="2">
+                <span class="heading-preview" style="font-size: 1.35rem; font-weight: bold;">Título 2</span>
+              </button>
+              <button class="heading-submenu-item" data-level="3">
+                <span class="heading-preview" style="font-size: 1.1rem; font-weight: bold;">Título 3</span>
+              </button>
+            </div>
+          </div>
+        </div>
+        <div class="dock-group dock-stats">
+          <span id="char-count" class="dock-stat">0 caracteres</span>
+          <span class="dock-stat-divider">·</span>
+          <span id="word-count" class="dock-stat">0 palabras</span>
+        </div>
       </div>
     </div>
 
@@ -37,102 +67,63 @@
     <p id="editor-error-msg" class="input-error-msg" style="display:none;"></p>
   </main>
 
-  <!-- Barra de herramientas inferior -->
-  <footer class="toolbar">
-    <div class="toolbar-container">
+  
 
-      <div class="toolbar-actions">
-        <button class="btn-utility" id="encrypt-btn">
-          <i data-lucide="lock" class="icon-slate"></i>
-          <span>Cifrar carta</span>
-        </button>
-
-        <button class="btn-utility">
-          <i data-lucide="terminal" class="icon-slate"></i>
-          <span>Comandos</span>
-        </button>
-      </div>
-
-      <div class="toolbar-status">
-        <span>UTF-8</span>
-      </div>
-
-    </div>
-  </footer>
-
-  <!-- KeyInputModal: modal para ingresar la clave de cifrado -->
-  <div id="key-input-modal" class="modal-overlay">
+  <!-- ShareModal: unified modal for creating and sharing secure links -->
+  <div id="share-modal" class="modal-overlay">
     <div class="modal-card modal-card--sm">
-
       <header class="modal-header">
         <div class="modal-title">
-          <i data-lucide="lock" class="icon-slate"></i>
-          <h2>Clave de cifrado</h2>
+<i data-lucide="share-2" class="icon-slate"></i>
+          <h2>Compartir carta</h2>
         </div>
-        <button class="btn-close-modal" id="close-key-modal-btn" aria-label="Cerrar modal de clave">
+        <button class="btn-close-modal" id="close-share-modal-btn" aria-label="Cerrar" onclick="document.getElementById('share-modal').classList.remove('is-active')">
           <i data-lucide="x" class="icon-slate"></i>
         </button>
       </header>
-
       <div class="modal-content">
-        <p class="text-sm text-slate-500 mb-4">Ingresa la clave secreta para cifrar tu carta. El receptor necesitará esta misma clave para leerla.</p>
-        <input
-          type="password"
-          id="key-input"
-          class="key-input-field"
-          placeholder="Clave secreta..."
-          autocomplete="off"
-        />
-        <p id="key-input-error" class="input-error-msg" style="display:none;">La clave no puede estar vacía.</p>
-      </div>
-
-      <footer class="modal-footer">
-        <span></span>
-        <button class="btn-primary-modal" id="confirm-key-btn">Confirmar</button>
-      </footer>
-
-    </div>
-  </div>
-
-  <!-- EncryptionModal: modal que muestra el ciphertext resultante -->
-  <div id="encryption-modal" class="modal-overlay">
-    <div class="modal-card modal-card--sm">
-
-      <header class="modal-header">
-        <div class="modal-title">
-          <i data-lucide="lock" class="icon-slate"></i>
-          <h2>Carta cifrada</h2>
+        <div class="encryption-section">
+          <div class="encryption-toggle">
+            <label class="toggle-label">Proteger con contraseña</label>
+            <input type="checkbox" id="encryption-toggle" class="toggle-input" checked>
+            <label for="encryption-toggle" class="toggle-switch"></label>
+          </div>
+          <div id="password-input-wrapper" class="password-input-wrapper">
+            <input
+              type="password"
+              id="share-key-input"
+              class="key-input-field"
+              placeholder="Palabra secreta..."
+              autocomplete="off"
+              disabled
+            />
+            <p id="share-key-error" class="input-error-msg" style="display:none;">La palabra secreta no puede estar vacía.</p>
+          </div>
         </div>
-        <button class="btn-close-modal" id="close-encryption-modal-btn" aria-label="Cerrar modal de cifrado">
-          <i data-lucide="x" class="icon-slate"></i>
-        </button>
-      </header>
 
-      <div class="modal-content">
-        <p class="text-sm text-slate-500 mb-4">Comparte este enlace con el receptor. Solo quien tenga la clave podrá leer la carta.</p>
-        <input
-          id="ciphertext-output"
-          type="text"
-          class="ciphertext-textarea"
-          readonly
-          placeholder="El enlace aparecerá aquí..."
-        />
-      </div>
+        <div id="share-buttons" class="share-buttons">
 
-      <footer class="modal-footer">
-        <button class="btn-utility" id="read-card-link-btn">
-          <i data-lucide="external-link" class="icon-slate"></i>
-          <span>Abrir carta</span>
-        </button>
-        <div class="flex items-center gap-2">
-          <button class="btn-utility" id="copy-ciphertext-btn">
-            <i data-lucide="copy" class="icon-slate"></i>
-            <span id="copy-btn-label">Copiar enlace</span>
-          </button>
-          <button class="btn-primary-modal" id="close-encryption-btn">Cerrar</button>
+        <p class="share-description">Elige cómo compartir tu carta</p>
+          <a id="share-whatsapp-btn" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" class="share-btn-item" style="text-decoration: none; color: inherit;">
+            <span class="share-btn-icon"><i data-lucide="message-circle"></i></span>
+            <span>Compartir en WhatsApp</span>
+            <span class="share-btn-arrow">↗</span>
+          </a>
+          <a id="share-email-btn" href="javascript:void(0)" target="_blank" class="share-btn-item" style="text-decoration: none; color: inherit;">
+            <span class="share-btn-icon"><i data-lucide="mail"></i></span>
+            <span>Compartir por Email</span>
+            <span class="share-btn-arrow">↗</span>
+          </a>
+          <a id="share-copy-btn" href="javascript:void(0)" class="share-btn-item" style="text-decoration: none; color: inherit;">
+            <span class="share-btn-icon"><i data-lucide="copy"></i></span>
+            <span>Copiar enlace</span>
+            <span class="share-btn-arrow">↗</span>
+          </a>
         </div>
+      </div>
+      <footer class="modal-footer">
+        <span id="share-copy-label" class="copy-feedback"></span>
       </footer>
-
     </div>
   </div>
 
