@@ -66,14 +66,14 @@
 % ==================================
 \addcontentsline{toc}{section}{Introducción}
 
-\noindent La Teoría de Lenguajes Formales proporciona los fundamentos matemáticos para el procesamiento automático de texto y el análisis sintáctico. Entre sus herramientas principales se encuentran las expresiones regulares, que permiten definir patrones mediante una notación declarativa para la búsqueda y validación de cadenas con estructura formal (correos electrónicos, URLs, fechas, etc); y los autómatas finitos, modelos abstractos compuestos por estados y transiciones que procesan secuencias de entrada símbolo a símbolo, resultando adecuados para reconocer lenguajes con estructura jerárquica como los comandos de personalización de una aplicación.
+\noindent La Teoría de Lenguajes Formales proporciona los fundamentos matemáticos para el procesamiento automático de texto y el análisis sintáctico. Entre sus herramientas principales se encuentran los autómatas finitos, modelos abstractos compuestos por estados y transiciones que procesan secuencias de entrada símbolo a símbolo. Estos formalismos se aplican tanto al reconocimiento de datos estructurados (correos electrónicos, URLs, fechas) como al análisis de comandos de personalización.
 El presente proyecto, desarrollado como trabajo final de la asignatura Teoría de Lenguajes Formales de la Universidad del Quindío, aplica estos conceptos al desarrollo de \emph{My Letter Locker}, una aplicación web para compartir cartas digitales de forma privada.
 
 % ==================================
 \section{Definición y requisitos del proyecto}
 \emph{My Letter Locker} es una aplicación web que permite compartir cartas digitales de forma privada, sin necesidad de registro ni almacenamiento en servidor. El contenido de cada carta se cifra mediante un algoritmo de cifrado simétrico y se embebe directamente en la URL, de manera que solo quien posea el enlace y la palabra secreta puede descifrar su contenido.
 
-Para procesar las entradas del usuario al momento de redación de la carta, se aplican técnicas de la Teoría de Lenguajes Formales que permiten reconocer dos tipos de patrones. Por un lado, las expresiones regulares definen patrones para identificar datos estructurados, como direcciones de correo, URLs o fechas. Por otro lado, los autómatas finitos modelan y reconocen patrones de comandos propios del sistema, los cuales modifican la apariencia del texto y el entorno visual de la aplicación.
+Para procesar las entradas del usuario, la aplicación emplea autómatas finitos como mecanismo formal de análisis. Estos modelos reconocen tanto datos estructurados (correos electrónicos, URLs, fechas) como comandos de personalización que modifican la apariencia del texto y el entorno visual.
 
 En las siguientes tablas se detallan los requisitos técnicos y funcionales del sistema.
 
@@ -85,7 +85,7 @@ En las siguientes tablas se detallan los requisitos técnicos y funcionales del 
 		\toprule
 		\textbf{Requisito}              & \textbf{Descripción}                                                                                            \\
 		\midrule
-		Validacion de patrones de datos & Verificación de formato mediante expresiones regulares para campos como correo electrónico, URL, fecha y título \\
+		validación de patrones de datos & Verificación de formato mediante autómatas finitos para campos como correo electrónico, URL, fecha y título \\
 		\addlinespace[0.6cm]
 		Reconocimiento de comandos      & Análisis sintáctico de comandos de formato y carta mediante autómatas finitos                                   \\
 		\addlinespace[0.6cm]
@@ -121,22 +121,133 @@ En las siguientes tablas se detallan los requisitos técnicos y funcionales del 
 
 % ==================================
 \section{Diseño e implementación}
-El proyecto busca ser minimalista, pero con funciones relevantes, para ello
-
-tener en cuenta sobretodo que debe interpretar la aplicación, esto es, los patrones a reconocer y el comportamiento de la aplicación al detectarlos. En este caso es importante diferenciar claramente esto a partir de la definición de los conceptos que se van a usar en la logica de la aplicación.
-
+El desarrollo de \emph{My Letter Locker} se fundamenta en una arquitectura modular que separa claramente los componentes de procesamiento de texto, gestión de comandos, cifrado y visualización. Esta sección describe los patrones reconocidos mediante autómatas finitos, las tecnologías utilizadas y la estructura del proyecto.
 
 \subsection{Patrones a identificar}
-\lipsum[4]
+La aplicación reconoce dos categorías de patrones mediante autómatas finitos implementados en TypeScript:
+
+\subsubsection{Comandos de formato y configuración}
+Los comandos siguen una sintaxis declarativa con delimitadores de dólar (\texttt{\$}). Un comando tiene la estructura \texttt{\$nombre\$valor\$} o \texttt{\$nombre:modificador\$valor\$}, donde:
+
+\begin{itemize}
+    \item \texttt{nombre} identifica el tipo de comando.
+    \item \texttt{modificador} (opcional) especifica parámetros adicionales.
+    \item \texttt{valor} contiene el contenido al que se aplica el comando.
+\end{itemize}
+
+Los comandos reconocidos incluyen:
+
+\begin{itemize}
+    \item \texttt{\$bold\$texto\$} — Aplica negrita al texto.
+    \item \texttt{\$italic\$texto\$} — Aplica cursiva al texto.
+    \item \texttt{\$title:n\$texto\$} — Renderiza texto como encabezado de nivel $n$ (1 a 6).
+    \item \texttt{\$pass\$palabra\$} — Define la palabra secreta para el cifrado.
+\end{itemize}
+
+El autómata que reconoce estos patrones utiliza tres estados:
+
+\begin{itemize}
+    \item \textbf{Q0 (Texto plano):} Estado inicial. Copia los caracteres al resultado hasta encontrar el primer \texttt{\$}.
+    \item \textbf{Q1 (Nombre del comando):} Acumula caracteres del nombre del comando hasta el siguiente \texttt{\$}.
+    \item \textbf{Q2 (Valor del comando):} Acumula el valor hasta encontrar el delimitador final \texttt{\$}, momento en que ejecuta el comando correspondiente.
+\end{itemize}
+
+La Figura~\ref{fig:automata-comandos} ilustra el diagrama de estados del autómata reconocedor.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=6cm]{automata-comandos.png}
+    \caption{Diagrama de estados del autómata reconocedor de comandos}
+    \label{fig:automata-comandos}
+\end{figure}
+
+\subsubsection{Datos estructurados}
+Para validar campos de entrada se emplean autómatas finitos que verifican el formato de:
+
+\begin{itemize}
+    \item \textbf{Correos electrónicos:} Formato \texttt{usuario@dominio.ext}.
+    \item \textbf{URLs:} Protocolo opcional seguido de dominio y ruta.
+    \item \textbf{Fechas:} Formato ISO~8601 (AAAA-MM-DD).
+    \item \textbf{Títulos:} Cadenas no vacías con longitud máxima de 100 caracteres.
+\end{itemize}
 
 \subsection{Tecnologías y herramientas seleccionadas}
-\lipsum[5]
+La pila tecnológica del proyecto prioriza la simplicidad y la portabilidad:
 
-\subsection{Estructura de proyecto}
-\lipsum[5]
+\begin{table}[H]
+    \centering
+    \begin{tabularx}{\textwidth}{p{3cm}X}
+        \toprule
+        \textbf{Tecnología} & \textbf{Uso en el proyecto} \\
+        \midrule
+        TypeScript & Lenguaje principal, tipado estático para mayor robustez \\
+        Vite & Bundler y servidor de desarrollo \\
+        Web Crypto API & Cifrado AES-GCM y derivación de claves PBKDF2 \\
+        Pako & Biblioteca de compresión gzip para JavaScript \\
+        HTML5/CSS3 & Interfaz de usuario \\
+        \bottomrule
+    \end{tabularx}
+\end{table}
+
+Se optó por Web Crypto API nativa del navegador en lugar de bibliotecas externas de criptografía, lo que elimina dependencias y reduce el tamaño del bundle.
+
+\subsection{Estructura del proyecto}
+El código fuente se organiza en módulos funcionales dentro del directorio \texttt{src/}:
+
+\begin{itemize}
+    \item \texttt{automaton/} — Implementación del autómata genérico y el reconocedor de comandos.
+    \item \texttt{commands/} — Definición y registro de comandos de formato.
+    \item \texttt{encryption/} — Servicio de cifrado y descifrado.
+    \item \texttt{routing/} — Sistema de enrutamiento de vistas.
+    \item \texttt{views/} — Componentes de interfaz (home, reader, readcard).
+\end{itemize}
+
+\subsection{Componentes principales}
+
+\subsubsection{Clase Automaton}
+La clase \texttt{Automaton} proporciona la lógica base para el reconocimiento de patrones. Sus componentes principales son:
+
+\begin{itemize}
+    \item \textbf{Estados:} Representados mediante \texttt{StatusDeclaration}.
+    \item \textbf{Transiciones:} Definidas por \texttt{TransitionDeclaration} con símbolo (string o expresión regular) y estado destino.
+    \item \textbf{Ejecución:} El método \texttt{run(cadena)} procesa la entrada símbolo a símbolo, lanzando error si no existe transición válida.
+    \item \textbf{Callbacks:} Permiten ejecutar acciones al atravesar una transición (\texttt{onTransition}).
+\end{itemize}
+
+\subsubsection{LetterLockerPreviewer}
+Esta clase coordina el autómata con el \texttt{CommandManager}:
+
+\begin{enumerate}
+    \item El autómata procesa el texto carácter a carácter.
+    \item Al encontrar un comando completo (estado Q2 $\rightarrow$ Q0), invoca el comando correspondiente.
+    \item El resultado HTML se concatena al resultado final.
+    \item Si se detecta \texttt{\$pass\$}, se extrae y almacena la palabra secreta.
+\end{enumerate}
+
+\subsection{Algoritmo de cifrado y compresión}
+El sistema implementa un flujo de procesamiento que combina compresión y cifrado para permitir cartas de hasta 60\,000 caracteres:
+
+\begin{enumerate}
+    \item \textbf{Compresión:} El texto plano se comprime mediante el algoritmo gzip utilizando la biblioteca Pako. Esta compresión reduce significativamente el tamaño del contenido antes del cifrado.
+    \item \textbf{Derivación de clave:} PBKDF2 con 100\,000 iteraciones y SHA-256 deriva una clave AES de 256 bits a partir de la palabra secreta.
+    \item \textbf{Cifrado:} AES-GCM con vector de inicialización aleatorio proporciona cifrado autenticado.
+    \item \textbf{Formato de salida:} Base64url de \texttt{[salt (16 bytes) | iv (12 bytes) | ciphertext]}.
+\end{enumerate}
+
+El flujo inverso (descifrado) invierte estos pasos: descifrar, descomprimir y procesar los comandos de formato.
+
+El formato Base64url (sin padding y con caracteres URL-safe) permite embeber el texto cifrado directamente en la URL.
 
 \subsection{Diseño de interfaz e interacción}
-\lipsum[5]
+La aplicación presenta tres vistas principales:
+
+\begin{itemize}
+    \item \textbf{Home (\texttt{/}):} Formulario de creación de carta. Incluye editor de texto con soporte para comandos, campo de palabra secreta, y botón para generar el enlace cifrado.
+    \item \textbf{Reader (\texttt{/read}):} Página de lectura. Solicita la palabra secreta al usuario y, si es correcta, muestra el contenido descifrado.
+    \item \textbf{ReadCard (\texttt{/read/card}):} Vista final que renderiza la carta con formato HTML.
+\end{itemize}
+
+La navegación entre vistas se gestiona mediante un sistema de enrutamiento basado en el hash de la URL, manteniendo la arquitectura de aplicación de página única (SPA).
 
 
 % ==================================

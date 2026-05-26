@@ -142,7 +142,7 @@ describe('WrongPassphraseError', () => {
 
   it('tiene el mensaje correcto', () => {
     const err = new WrongPassphraseError();
-    expect(err.message).toBe('La clave proporcionada es incorrecta');
+    expect(err.message).toBe('The provided key is incorrect');
   });
 
   it('tiene el nombre correcto', () => {

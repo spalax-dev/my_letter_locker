@@ -1,0 +1,495 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "inter";
+}
+
+/* ============================================================
+   LAYOUT COMPARTIDO — Estructura base de todas las vistas
+   ============================================================ */
+
+.app-page {
+  @apply min-h-screen bg-slate-50 flex flex-col;
+}
+
+/* Header compartido */
+.app-header {
+  @apply w-full px-6 py-4 flex items-center justify-between border-b border-slate-200/60 bg-white/70 backdrop-blur-sm;
+}
+
+.app-brand {
+  @apply flex items-center gap-2 text-sm font-semibold tracking-widest uppercase text-slate-400;
+}
+
+.brand-icon {
+  @apply w-4 h-4 text-indigo-400;
+}
+
+.app-header-mode {
+  @apply text-xs font-medium tracking-wider uppercase text-indigo-500;
+}
+
+.app-header-nav {
+  @apply flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-600 transition-colors duration-200;
+}
+
+/* Iconos genéricos */
+.icon-slate {
+  @apply w-4 h-4 text-slate-500;
+}
+
+/* CodeMirror Command Widgets */
+.cmd-inline {
+  position: relative;
+  cursor: pointer;
+}
+
+.cmd-inline--bold {
+  font-weight: bold;
+}
+
+.cmd-inline--italic {
+  font-style: italic;
+}
+
+.cmd-inline .raw {
+  display: none;
+  font-family: monospace;
+  background: #fef3c7;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.cmd-inline:hover .raw {
+  display: inline;
+}
+
+.cmd-inline:hover .interpreted {
+  display: none;
+}
+
+.cmd-line--title[data-level="1"] {
+  font-size: 2em;
+  font-weight: bold;
+  color: #1e293b;
+  display: block;
+  margin: 0.5em 0;
+}
+
+.cmd-line--title[data-level="2"] {
+  font-size: 1.5em;
+  font-weight: bold;
+  color: #334155;
+}
+
+.cmd-line--title[data-level="3"] {
+  font-size: 1.25em;
+  font-weight: bold;
+  color: #475569;
+}
+
+.cmd-url {
+  color: #3b82f6;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cmd-email {
+  color: #8b5cf6;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cmd-line {
+  position: relative;
+  cursor: pointer;
+}
+
+.cmd-line .raw {
+  display: none;
+  font-family: monospace;
+  background: #f0f0f0;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.cmd-line:hover .raw {
+  display: block;
+}
+
+.cmd-line:hover .interpreted {
+  display: none;
+}
+
+/* Editor container for CodeMirror */
+.editor-container .cm-editor {
+  outline: none;
+  min-height: 300px;
+}
+
+.editor-container .cm-scroller {
+  font-family: inherit;
+  line-height: 1.625;
+}
+
+.editor-container .cm-content {
+  caret-color: auto;
+}
+
+.editor-container .cm-line {
+  padding: 0 4px;
+}
+
+/* ============================================================
+   HOME VIEW — Editor
+   ============================================================ */
+
+.editor-main {
+  @apply flex-1 max-w-4xl w-full mx-auto px-6 pt-8 pb-24 flex flex-col;
+}
+
+.editor-meta {
+  @apply mb-4 flex items-center justify-between text-xs font-medium tracking-wider uppercase;
+}
+
+.meta-filename {
+  @apply text-slate-400;
+}
+
+.meta-wordcount {
+  @apply text-slate-400 font-mono;
+}
+
+.meta-counts {
+  @apply flex items-center gap-2 text-xs font-medium text-slate-400;
+}
+
+.meta-divider {
+  @apply text-slate-300;
+}
+
+.meta-charcount {
+  @apply font-mono;
+}
+
+.editor-contenteditable {
+  @apply flex-1 w-full bg-transparent text-base leading-relaxed text-slate-700 placeholder-slate-400 focus:outline-none focus:ring-0 p-3 border border-slate-200 rounded-lg shadow-sm min-h-[300px];
+  outline: none;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.625;
+}
+
+.editor-contenteditable:empty::before {
+  content: attr(data-placeholder);
+  color: #94a3b8;
+  pointer-events: none;
+}
+
+.editor-container {
+  @apply relative flex-1 flex flex-col;
+}
+
+.cmd {
+  position: relative;
+  cursor: pointer;
+}
+
+.cmd .interpreted {
+  display: inline;
+}
+
+.cmd .raw {
+  display: none;
+}
+
+.cmd:hover .interpreted {
+  display: none;
+}
+
+.cmd:hover .raw {
+  display: inline;
+  background-color: #fef3c7;
+  padding: 0 2px;
+  border-radius: 2px;
+}
+
+.cmd-line {
+  display: block;
+}
+
+.cmd-line .interpreted {
+  display: block;
+}
+
+.cmd-line .raw {
+  display: none;
+  font-family: monospace;
+  background: #fef3c7;
+  padding: 2px 4px;
+  border-radius: 3px;
+}
+
+.cmd-line:hover .interpreted {
+  display: none;
+}
+
+.cmd-line:hover .raw {
+  display: block;
+}
+
+.cmd-line.committed .raw {
+  display: none;
+}
+
+.cmd-line.committed.editing .raw {
+  display: block;
+}
+
+.cmd-line.committed.editing .interpreted {
+  display: none;
+}
+
+.cmd-line.committed .interpreted {
+  display: block;
+}
+
+.cmd-line.committed:hover .interpreted {
+  display: block;
+}
+
+.cmd-line.committed:hover .raw {
+  display: none;
+}
+
+/* Barra de herramientas inferior */
+.toolbar {
+  @apply fixed bottom-0 left-0 right-0 border-t border-slate-200/80 bg-white/80 backdrop-blur-md;
+}
+
+.toolbar-container {
+  @apply max-w-4xl mx-auto px-6 h-14 flex items-center justify-between text-sm text-slate-600;
+}
+
+.toolbar-actions {
+  @apply flex items-center space-x-1;
+}
+
+.btn-utility {
+  @apply flex items-center space-x-2 px-3 py-1.5 rounded-lg hover:bg-slate-100 text-slate-700 transition-all duration-200 active:scale-95 font-medium;
+}
+
+.toolbar-status {
+  @apply flex items-center space-x-4 text-xs text-slate-400 font-mono;
+}
+
+/* Modal de vista previa */
+.modal-overlay {
+  @apply fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm opacity-0 pointer-events-none transition-opacity duration-300 ease-in-out;
+}
+
+.modal-overlay.is-active {
+  @apply opacity-100 pointer-events-auto;
+}
+
+.modal-card {
+  @apply bg-white w-full max-w-3xl h-[85vh] rounded-xl shadow-xl border border-slate-200/60 flex flex-col overflow-hidden;
+}
+
+.modal-header {
+  @apply px-6 h-16 border-b border-slate-100 flex items-center justify-between bg-slate-50/50;
+}
+
+.modal-title {
+  @apply flex items-center space-x-2.5 font-semibold text-slate-700;
+}
+
+.btn-close-modal {
+  @apply p-1.5 rounded-lg hover:bg-slate-100 text-slate-500 transition-colors duration-200 active:scale-95;
+}
+
+.modal-content {
+  @apply flex-1 overflow-y-auto px-8 py-6 text-slate-700 leading-relaxed whitespace-pre-line;
+}
+
+.modal-footer {
+  @apply px-6 h-14 border-t border-slate-100 flex items-center justify-between bg-slate-50/50;
+}
+
+.btn-primary-modal {
+  @apply px-4 py-1.5 bg-slate-900 text-white font-medium text-xs rounded-lg hover:bg-slate-800 transition-colors duration-200 active:scale-95;
+}
+
+/* ============================================================
+   MARKDOWN BODY — Estilos compartidos de contenido renderizado
+   ============================================================ */
+
+.markdown-body h1 {
+  @apply text-2xl font-bold text-slate-900 mb-4 pb-2 border-b border-slate-100;
+}
+
+.markdown-body h2 {
+  @apply text-xl font-semibold text-slate-800 mt-6 mb-3;
+}
+
+.markdown-body p {
+  @apply mb-4 text-base text-slate-600;
+}
+
+.markdown-body ul {
+  @apply list-disc list-inside mb-4 pl-2 space-y-1 text-slate-600;
+}
+
+.markdown-body blockquote {
+  @apply my-5 pl-4 border-l-4 border-indigo-500 italic text-slate-500 bg-slate-50/80 py-2 rounded-r-lg;
+}
+
+.markdown-body code {
+  @apply px-1.5 py-0.5 bg-slate-100 text-slate-800 text-sm rounded font-mono font-medium;
+}
+
+/* ============================================================
+   READCARD VIEW — Minimal letter reading
+   ============================================================ */
+
+.readcard-page {
+  @apply min-h-screen bg-white flex flex-col;
+}
+
+.readcard-content {
+  @apply flex-1 max-w-2xl w-full mx-auto px-8 py-12;
+}
+
+.readcard-title {
+  @apply text-3xl font-bold text-slate-900 mb-6;
+}
+
+.readcard-body {
+  @apply text-base text-slate-700 leading-relaxed;
+}
+
+/* Separator + footer link */
+.readcard-footer {
+  @apply px-8 py-8;
+}
+
+.readcard-divider {
+  @apply max-w-2xl mx-auto w-full border-t border-slate-200 mb-4;
+}
+
+.readcard-footer-link {
+  @apply block max-w-2xl mx-auto text-center text-sm text-slate-400 hover:text-indigo-500 transition-colors duration-200;
+}
+
+/* ============================================================
+   ENCRYPTION / DECRYPTION MODALS — Componentes de cifrado
+   ============================================================ */
+
+/* Variante compacta del modal-card para modales de clave */
+.modal-card--sm {
+  @apply max-w-md h-auto;
+}
+
+/* Campo de entrada de clave */
+.key-input-field {
+  @apply w-full px-3 py-2 text-sm text-slate-700 bg-white border border-slate-200 rounded-lg shadow-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition-colors duration-200;
+}
+
+/* Textarea de solo lectura para el ciphertext */
+.ciphertext-textarea {
+  @apply w-full h-36 px-3 py-2 text-xs text-slate-600 bg-slate-50 border border-slate-200 rounded-lg shadow-sm font-mono resize-none focus:outline-none focus:ring-2 focus:ring-indigo-300 focus:border-indigo-400 transition-colors duration-200;
+}
+
+/* Mensaje de error inline */
+.input-error-msg {
+  @apply mt-2 text-xs text-red-500 font-medium;
+}
+
+/* Estado "copiado" del botón copiar */
+.btn-copied {
+  @apply text-emerald-600;
+}
+
+.btn-copied .icon-slate {
+  @apply text-emerald-500;
+}
+
+/* ============================================================
+   READER VIEW — Historial de cartas leídas
+   ============================================================ */
+
+.reader-main {
+  @apply flex-1 max-w-2xl w-full mx-auto px-4 py-10 flex flex-col gap-6;
+}
+
+.reader-header {
+  @apply flex flex-col gap-1;
+}
+
+.reader-title {
+  @apply text-xl font-bold text-slate-800 tracking-tight;
+}
+
+.reader-subtitle {
+  @apply text-sm text-slate-400;
+}
+
+/* Lista */
+.history-list {
+  @apply flex flex-col gap-3;
+}
+
+/* Item */
+.history-item {
+  @apply flex items-center gap-4 bg-white border border-slate-200/80 rounded-xl px-4 py-3 shadow-sm hover:shadow-md transition-shadow duration-200;
+}
+
+.history-item-icon {
+  @apply w-9 h-9 rounded-full bg-indigo-50 flex items-center justify-center shrink-0;
+}
+
+.history-lock-icon {
+  @apply w-4 h-4 text-indigo-400;
+}
+
+.history-item-body {
+  @apply flex-1 flex flex-col gap-0.5 min-w-0;
+}
+
+.history-item-id {
+  @apply text-xs font-mono text-slate-500 truncate;
+}
+
+.history-item-date {
+  @apply text-xs text-slate-400;
+}
+
+.history-item-actions {
+  @apply flex items-center gap-1 shrink-0;
+}
+
+.history-delete-btn {
+  @apply p-1.5 rounded-lg hover:bg-red-50 text-slate-400 hover:text-red-400 transition-colors duration-200 active:scale-95;
+}
+
+.history-delete-icon {
+  @apply w-4 h-4;
+}
+
+/* Estado vacío */
+.history-empty {
+  @apply flex-1 flex flex-col items-center justify-center gap-3 py-20 text-center;
+}
+
+.history-empty-icon {
+  @apply w-10 h-10 text-slate-300;
+}
+
+.history-empty-text {
+  @apply text-sm font-medium text-slate-500;
+}
+
+.history-empty-sub {
+  @apply text-xs text-slate-400;
+}

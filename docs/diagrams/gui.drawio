@@ -1,6 +1,6 @@
 <mxfile host="Electron" agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) draw.io/29.6.1 Chrome/142.0.7444.265 Electron/39.8.10 Safari/537.36" version="29.6.1">
   <diagram name="Page-1" id="BFzWkW0VmY9ajXVr6wvR">
-    <mxGraphModel dx="1532" dy="1022" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+    <mxGraphModel dx="1429" dy="965" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
@@ -420,6 +420,61 @@
               <mxPoint x="1205" y="40" />
             </Array>
           </mxGeometry>
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="" vertex="1">
+          <mxGeometry height="370" width="610" x="2370" y="130" as="geometry" />
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-13" parent="1" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Heading&lt;/h1&gt;&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.&lt;/span&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="120" width="470" x="2450" y="175" as="geometry" />
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-15" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="2920" y="455" />
+            </Array>
+            <mxPoint x="2440" y="455" as="sourcePoint" />
+            <mxPoint x="2920" y="460" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-17" connectable="0" parent="FPt8P1nXMLdK61l038xz-15" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];" value="&amp;nbsp; &amp;nbsp; &amp;nbsp;" vertex="1">
+          <mxGeometry relative="1" x="0.9869" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-18" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Reader view" vertex="1">
+          <mxGeometry height="30" width="110" x="2370" y="100" as="geometry" />
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-19" parent="1" style="rounded=0;whiteSpace=wrap;html=1;fillColor=#f5f5f5;fontColor=#333333;strokeColor=#666666;" value="" vertex="1">
+          <mxGeometry height="370" width="610" x="3040" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-20" parent="1" style="text;html=1;whiteSpace=wrap;overflow=hidden;rounded=0;fillColor=#f5f5f5;fontColor=#333333;strokeColor=none;" value="&lt;h1 style=&quot;margin-top: 0px;&quot;&gt;Heading&lt;/h1&gt;&lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.&amp;nbsp;&lt;span style=&quot;background-color: transparent; color: light-dark(rgb(0, 0, 0), rgb(255, 255, 255));&quot;&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.&lt;/span&gt;&lt;/p&gt;" vertex="1">
+          <mxGeometry height="120" width="470" x="3120" y="165" as="geometry" />
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-21" edge="1" parent="1" style="endArrow=none;html=1;rounded=0;fillColor=#f5f5f5;strokeColor=#666666;" value="">
+          <mxGeometry height="50" relative="1" width="50" as="geometry">
+            <Array as="points">
+              <mxPoint x="3590" y="445" />
+            </Array>
+            <mxPoint x="3110" y="445" as="sourcePoint" />
+            <mxPoint x="3590" y="450" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-22" connectable="0" parent="FPt8P1nXMLdK61l038xz-21" style="edgeLabel;html=1;align=center;verticalAlign=middle;resizable=0;points=[];labelBackgroundColor=none;" value="&amp;nbsp; &amp;nbsp; &amp;nbsp;" vertex="1">
+          <mxGeometry relative="1" x="0.9869" y="1" as="geometry">
+            <mxPoint as="offset" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-23" parent="1" style="rounded=1;whiteSpace=wrap;html=1;arcSize=8;" value="" vertex="1">
+          <mxGeometry height="230" width="300" x="3205" y="190" as="geometry" />
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-24" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;" value="Secret key" vertex="1">
+          <mxGeometry height="30" width="60" x="3230" y="210" as="geometry" />
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-25" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;" value="&lt;font style=&quot;color: rgb(115, 115, 115);&quot;&gt;&amp;nbsp; Palabra secreta ...&lt;/font&gt;" vertex="1">
+          <mxGeometry height="35" width="220" x="3240" y="282.5" as="geometry" />
+        </mxCell>
+        <mxCell id="FPt8P1nXMLdK61l038xz-26" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;" value="decrypt" vertex="1">
+          <mxGeometry height="30" width="120" x="3240" y="350" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>

@@ -1,0 +1,130 @@
+<div class="app-page">
+
+  <!-- Header compartido con branding -->
+  <header class="app-header">
+    <span class="app-brand">
+      <i data-lucide="file-text" class="brand-icon"></i>
+      Letter Locker
+    </span>
+    <span class="app-header-mode">Modo Edición</span>
+  </header>
+
+  <!-- Área del editor -->
+  <main class="editor-main">
+    <div class="editor-meta">
+      <span class="meta-filename">Documento sin título</span>
+      <div class="meta-counts">
+        <span class="meta-charcount" id="char-count">0 characters</span>
+        <span class="meta-divider">·</span>
+        <span class="meta-wordcount" id="word-count">0 words</span>
+      </div>
+    </div>
+
+    <div class="editor-container">
+      <div id="editor" class="editor-contenteditable" spellcheck="false" data-placeholder="Start writing your letter here..."></div>
+    </div>
+
+    <!-- Mensaje de error inline del editor -->
+    <p id="editor-error-msg" class="input-error-msg" style="display:none;"></p>
+  </main>
+
+  <!-- Barra de herramientas inferior -->
+  <footer class="toolbar">
+    <div class="toolbar-container">
+
+      <div class="toolbar-actions">
+        <button class="btn-utility" id="encrypt-btn">
+          <i data-lucide="lock" class="icon-slate"></i>
+          <span>Cifrar carta</span>
+        </button>
+
+        <button class="btn-utility">
+          <i data-lucide="terminal" class="icon-slate"></i>
+          <span>Comandos</span>
+        </button>
+      </div>
+
+      <div class="toolbar-status">
+        <span>UTF-8</span>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- KeyInputModal: modal para ingresar la clave de cifrado -->
+  <div id="key-input-modal" class="modal-overlay">
+    <div class="modal-card modal-card--sm">
+
+      <header class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="lock" class="icon-slate"></i>
+          <h2>Clave de cifrado</h2>
+        </div>
+        <button class="btn-close-modal" id="close-key-modal-btn" aria-label="Cerrar modal de clave">
+          <i data-lucide="x" class="icon-slate"></i>
+        </button>
+      </header>
+
+      <div class="modal-content">
+        <p class="text-sm text-slate-500 mb-4">Ingresa la clave secreta para cifrar tu carta. El receptor necesitará esta misma clave para leerla.</p>
+        <input
+          type="password"
+          id="key-input"
+          class="key-input-field"
+          placeholder="Clave secreta..."
+          autocomplete="off"
+        />
+        <p id="key-input-error" class="input-error-msg" style="display:none;">La clave no puede estar vacía.</p>
+      </div>
+
+      <footer class="modal-footer">
+        <span></span>
+        <button class="btn-primary-modal" id="confirm-key-btn">Confirmar</button>
+      </footer>
+
+    </div>
+  </div>
+
+  <!-- EncryptionModal: modal que muestra el ciphertext resultante -->
+  <div id="encryption-modal" class="modal-overlay">
+    <div class="modal-card modal-card--sm">
+
+      <header class="modal-header">
+        <div class="modal-title">
+          <i data-lucide="lock" class="icon-slate"></i>
+          <h2>Carta cifrada</h2>
+        </div>
+        <button class="btn-close-modal" id="close-encryption-modal-btn" aria-label="Cerrar modal de cifrado">
+          <i data-lucide="x" class="icon-slate"></i>
+        </button>
+      </header>
+
+      <div class="modal-content">
+        <p class="text-sm text-slate-500 mb-4">Comparte este enlace con el receptor. Solo quien tenga la clave podrá leer la carta.</p>
+        <input
+          id="ciphertext-output"
+          type="text"
+          class="ciphertext-textarea"
+          readonly
+          placeholder="El enlace aparecerá aquí..."
+        />
+      </div>
+
+      <footer class="modal-footer">
+        <button class="btn-utility" id="read-card-link-btn">
+          <i data-lucide="external-link" class="icon-slate"></i>
+          <span>Abrir carta</span>
+        </button>
+        <div class="flex items-center gap-2">
+          <button class="btn-utility" id="copy-ciphertext-btn">
+            <i data-lucide="copy" class="icon-slate"></i>
+            <span id="copy-btn-label">Copiar enlace</span>
+          </button>
+          <button class="btn-primary-modal" id="close-encryption-btn">Cerrar</button>
+        </div>
+      </footer>
+
+    </div>
+  </div>
+
+</div>
