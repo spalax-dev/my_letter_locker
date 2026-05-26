@@ -98,6 +98,14 @@ export class HomeView implements View {
       parent: editorContainer,
     });
 
+    this.editorView.focus();
+
+    document.addEventListener('click', (e) => {
+      if (this.editorView && !this.editorView.dom.contains(e.target as Node)) {
+        this.editorView.focus();
+      }
+    });
+
     this.encryptBtn.addEventListener('click', () => {
       this.handleEncryptClick();
     });
@@ -159,19 +167,25 @@ export class HomeView implements View {
 
     for (const cmd of commands) {
       if (cmd.isLineCommand) {
+        const secondDollar = doc.indexOf('$', cmd.start + 1);
+        const syntaxEnd = secondDollar + 1;
+        const contentStart = syntaxEnd;
+        const contentEnd = cmd.end;
+
+        builder.add(cmd.start, syntaxEnd, Decoration.mark({
+          class: 'cmd-syntax'
+        }));
+
         const level = cmd.command === 'title' ? 1 : parseInt(cmd.command.split(':')[1] || '1', 10);
-        builder.add(cmd.start, cmd.end, Decoration.mark({
-          class: `cmd-line cmd-line--title`,
+        builder.add(contentStart, contentEnd, Decoration.mark({
+          class: `cmd-content cmd-line--title`,
           attributes: { 'data-level': level.toString() }
         }));
       } else {
-        builder.add(cmd.start, cmd.end, Decoration.mark({
-          class: `cmd-inline cmd-inline--${cmd.command}`,
-          attributes: {
-            'data-command': cmd.command,
-            'data-value': cmd.value,
-          },
-        }));
+        const openEnd = cmd.start + cmd.command.length + 2;
+        builder.add(cmd.start, openEnd, Decoration.mark({ class: 'cmd-syntax' }));
+        builder.add(openEnd, cmd.end - 1, Decoration.mark({ class: `cmd-content cmd-content--${cmd.command}` }));
+        builder.add(cmd.end - 1, cmd.end, Decoration.mark({ class: 'cmd-syntax' }));
       }
     }
 

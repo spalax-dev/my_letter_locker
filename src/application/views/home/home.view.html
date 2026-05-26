@@ -3,16 +3,19 @@
   <!-- Header compartido con branding -->
   <header class="app-header">
     <span class="app-brand">
-      <i data-lucide="file-text" class="brand-icon"></i>
-      Letter Locker
+      <picture class="app-logo h-6 w-auto">
+        <source srcset="/logo-dark.svg" media="(prefers-color-scheme: dark)">
+        <source srcset="/logo-light.svg" media="(prefers-color-scheme: light)">
+        <img src="/logo-light.svg" alt="Logo" class="h-6 w-auto">
+      </picture>
     </span>
-    <span class="app-header-mode">Modo Edición</span>
+    <span class="app-header-mode">
   </header>
 
   <!-- Área del editor -->
   <main class="editor-main">
     <div class="editor-meta">
-      <span class="meta-filename">Documento sin título</span>
+      
       <div class="meta-counts">
         <span class="meta-charcount" id="char-count">0 characters</span>
         <span class="meta-divider">·</span>

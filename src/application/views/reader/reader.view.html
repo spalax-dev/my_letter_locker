@@ -3,10 +3,13 @@
   <!-- Header compartido con branding -->
   <header class="app-header">
     <span class="app-brand">
-      <i data-lucide="file-text" class="brand-icon"></i>
-      Letter Locker
+      <picture class="app-logo h-6 w-auto">
+        <source srcset="/logo-dark.svg" media="(prefers-color-scheme: dark)">
+        <source srcset="/logo-light.svg" media="(prefers-color-scheme: light)">
+        <img src="/logo-light.svg" alt="Logo" class="h-6 w-auto">
+      </picture>
     </span>
-    <span class="app-header-mode">Mis Cartas</span>
+    <span class="app-header-mode">
   </header>
 
   <!-- Contenido principal -->
