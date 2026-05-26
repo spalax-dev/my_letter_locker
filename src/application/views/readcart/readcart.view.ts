@@ -48,6 +48,13 @@ export class ReadCardView implements View {
   }
 
   afterRender(): void {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+
     this.titleEl = document.getElementById("letter-title");
     this.contentEl = document.getElementById("letter-content");
 
