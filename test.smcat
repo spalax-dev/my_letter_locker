@@ -1,5 +1,0 @@
-initial,
-backlog => doing;
-doing => test;
-test => final;
-final;

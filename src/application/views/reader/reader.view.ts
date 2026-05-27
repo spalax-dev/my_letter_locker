@@ -1,3 +1,4 @@
+import { createIcons } from 'lucide';
 import { Previewer } from "../../../core/previewer/Previewer";
 import type { View } from "../base.view";
 
@@ -108,6 +109,7 @@ export class ReaderView implements View {
 
     if (this.contentEl) {
       this.contentEl.innerHTML = bodyContent;
+      createIcons();
     }
   }
 
@@ -148,6 +150,7 @@ export class ReaderView implements View {
     }
     if (this.contentEl) {
       this.contentEl.innerHTML = '<p>Esta carta está protegida con contraseña.</p>';
+      createIcons();
     }
   }
 
@@ -157,6 +160,7 @@ export class ReaderView implements View {
     }
     if (this.contentEl) {
       this.contentEl.innerHTML = '<p>No se encontró contenido para mostrar.</p>';
+      createIcons();
     }
   }
 

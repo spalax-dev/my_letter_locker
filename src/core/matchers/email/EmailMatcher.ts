@@ -25,7 +25,7 @@ export class EmailMatcher implements Matcher {
       replacements.push({
         start: email.start,
         end: email.end,
-        replacement: `<a href="mailto:${emailText}">${emailText}</a>`,
+        replacement: `<a href="mailto:${emailText}" class="email-link"><i data-lucide="mail" class="match-icon"></i>${emailText}</a>`,
         type: 'email'
       });
     }

@@ -1,4 +1,5 @@
 import type { Matcher, Replacement } from '../automaton/types';
+import { PhoneMatcher } from '../matchers/phone/PhoneMatcher';
 
 export class ImplicitAnalyzer {
   private commandMatcher: Matcher;
@@ -7,6 +8,7 @@ export class ImplicitAnalyzer {
   private urlMatcher: Matcher;
   private emailMatcher: Matcher;
   private dateMatcher: Matcher;
+  private phoneMatcher: Matcher;
 
   constructor(
     commandMatcher: Matcher,
@@ -14,7 +16,8 @@ export class ImplicitAnalyzer {
     tabMatcher: Matcher,
     urlMatcher: Matcher,
     emailMatcher: Matcher,
-    dateMatcher: Matcher
+    dateMatcher: Matcher,
+    phoneMatcher?: Matcher
   ) {
     this.commandMatcher = commandMatcher;
     this.newlineMatcher = newlineMatcher;
@@ -22,6 +25,7 @@ export class ImplicitAnalyzer {
     this.urlMatcher = urlMatcher;
     this.emailMatcher = emailMatcher;
     this.dateMatcher = dateMatcher;
+    this.phoneMatcher = phoneMatcher || new PhoneMatcher();
   }
 
   analyze(content: string): string {
@@ -33,6 +37,7 @@ export class ImplicitAnalyzer {
     const urlReplacements = this.filterUncovered(this.urlMatcher.match(content), coveredRegions);
     const emailReplacements = this.filterUncovered(this.emailMatcher.match(content), coveredRegions);
     const dateReplacements = this.filterUncovered(this.dateMatcher.match(content), coveredRegions);
+    const phoneReplacements = this.filterUncovered(this.phoneMatcher.match(content), coveredRegions);
 
     const allReplacements = [
       ...commandReplacements,
@@ -40,7 +45,8 @@ export class ImplicitAnalyzer {
       ...tabReplacements,
       ...urlReplacements,
       ...emailReplacements,
-      ...dateReplacements
+      ...dateReplacements,
+      ...phoneReplacements
     ].sort((a, b) => b.start - a.start);
 
     return this.applyReplacements(content, allReplacements);

@@ -90,7 +90,18 @@ export class CommandAutomaton {
         }
         break;
       case 'Q3':
-        if (char === '\n' || isEndOfText) {
+        if (char === '$') {
+          this.commands.push({
+            command: this.commandName,
+            value: this.commandValue,
+            start: this.startPos,
+            end: pos + 1,
+            isLineCommand: true
+          });
+          this.commandName = '';
+          this.commandValue = '';
+          this.state = 'Q0';
+        } else if (char === '\n' || isEndOfText) {
           this.commands.push({
             command: this.commandName,
             value: this.commandValue,

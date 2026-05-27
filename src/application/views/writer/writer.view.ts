@@ -10,6 +10,7 @@ import { CommandMatcher } from "../../../core/matchers/command/CommandMatcher";
 import { UrlMatcher } from "../../../core/matchers/url/UrlMatcher";
 import { EmailMatcher } from "../../../core/matchers/email/EmailMatcher";
 import { DateMatcher } from "../../../core/matchers/date/DateMatcher";
+import { PhoneMatcher } from "../../../core/matchers/phone/PhoneMatcher";
 import type { Replacement } from "../../../core/automaton/types";
 
 import { EditorView, keymap, highlightActiveLine, highlightSpecialChars, Decoration } from '@codemirror/view';
@@ -24,6 +25,7 @@ export class WriterView implements View {
   private urlMatcher = new UrlMatcher();
   private emailMatcher = new EmailMatcher();
   private dateMatcher = new DateMatcher();
+  private phoneMatcher = new PhoneMatcher();
 
   private shareModal!: HTMLDivElement;
   private encryptionToggle!: HTMLInputElement;
@@ -224,7 +226,7 @@ export class WriterView implements View {
       console.log('[Pattern] Commands found:', commands.map(c => `$${c.command}$${c.value}$`));
     }
 
-    for (const cmd of commands) {
+    for (const cmd of [...commands].sort((a, b) => a.start - b.start)) {
       if (cmd.isLineCommand) {
         const secondDollar = doc.indexOf('$', cmd.start + 1);
         const syntaxEnd = secondDollar + 1;
@@ -278,6 +280,17 @@ export class WriterView implements View {
       builder.add(date.start, date.end, Decoration.mark({
         class: 'cmd-date',
         attributes: { 'data-date': doc.substring(date.start, date.end) }
+      }));
+    }
+
+    const phoneResults = this.phoneMatcher.match(doc) as Replacement[];
+    if (phoneResults.length > 0) {
+      console.log('[Pattern] Phones found:', phoneResults.map(r => doc.substring(r.start, r.end)));
+    }
+    for (const phone of phoneResults) {
+      builder.add(phone.start, phone.end, Decoration.mark({
+        class: 'cmd-phone',
+        attributes: { 'data-phone': doc.substring(phone.start, phone.end) }
       }));
     }
 

@@ -109,35 +109,80 @@ export class DateAutomaton {
 
   pushDate(): void {
     if (this.mode === 'slash' && this.first.length === 2 && this.second.length === 2 && this.third.length === 4) {
+      const month = parseInt(this.second);
+      const day = parseInt(this.first);
+      const year = parseInt(this.third);
+
+      if (month < 1 || month > 12) {
+        console.info(`Date pattern at position ${this.startPos} is invalid for parsing (month ${month} out of range, must be 1-12)`);
+        return;
+      }
+
+      if (day < 1 || day > 31) {
+        console.info(`Date pattern at position ${this.startPos} is invalid for parsing (day ${day} out of range, must be 1-31)`);
+        return;
+      }
+
       this.dates.push({
         start: this.startPos,
         end: this.startPos + 10,
-        year: parseInt(this.third),
-        month: parseInt(this.second),
-        day: parseInt(this.first)
+        year: year,
+        month: month,
+        day: day
       });
+      console.log(`Date pattern detected and parsed: ${this.first}/${this.second}/${this.third} (position ${this.startPos})`);
     } else if (this.mode === 'slash' && this.first.length === 4 && this.second.length === 2 && this.third.length === 2) {
+      const year = parseInt(this.first);
+      const month = parseInt(this.second);
+      const day = parseInt(this.third);
+
+      if (month < 1 || month > 12) {
+        console.info(`Date pattern at position ${this.startPos} is invalid for parsing (month ${month} out of range, must be 1-12)`);
+        return;
+      }
+
+      if (day < 1 || day > 31) {
+        console.info(`Date pattern at position ${this.startPos} is invalid for parsing (day ${day} out of range, must be 1-31)`);
+        return;
+      }
+
       this.dates.push({
         start: this.startPos,
         end: this.startPos + 10,
-        year: parseInt(this.first),
-        month: parseInt(this.second),
-        day: parseInt(this.third)
+        year: year,
+        month: month,
+        day: day
       });
+      console.log(`Date pattern detected and parsed: ${this.first}/${this.second}/${this.third} (position ${this.startPos})`);
     } else if (this.mode === 'dash' && this.first.length === 4 && this.second.length === 2 && this.third.length === 2) {
+      const year = parseInt(this.first);
+      const month = parseInt(this.second);
+      const day = parseInt(this.third);
+
+      if (month < 1 || month > 12) {
+        console.info(`Date pattern at position ${this.startPos} is invalid for parsing (month ${month} out of range, must be 1-12)`);
+        return;
+      }
+
+      if (day < 1 || day > 31) {
+        console.info(`Date pattern at position ${this.startPos} is invalid for parsing (day ${day} out of range, must be 1-31)`);
+        return;
+      }
+
       this.dates.push({
         start: this.startPos,
         end: this.startPos + 10,
-        year: parseInt(this.first),
-        month: parseInt(this.second),
-        day: parseInt(this.third)
+        year: year,
+        month: month,
+        day: day
       });
+      console.log(`Date pattern detected and parsed: ${this.first}/${this.second}/${this.third} (position ${this.startPos})`);
     }
   }
 
   finalize(_pos: number): void {
-    if (this.state !== 'collecting_first' && this.startPos !== -1 && (this.first.length > 0 || this.second.length > 0 || this.third.length > 0)) {
-      console.info(`Date pattern at position ${this.startPos} is invalid for parsing (incomplete: ${this.first}/${this.second}/${this.third})`);
+    if (this.startPos === -1) {
+      return;
     }
     this.pushDate();
   }

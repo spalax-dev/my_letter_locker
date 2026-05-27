@@ -21,11 +21,11 @@ export class UrlMatcher implements Matcher {
     const replacements: Replacement[] = [];
 
     for (const url of urls) {
-      const urlText = content.substring(url.start, url.end);
+      const fullUrl = content.substring(url.start, url.end);
       replacements.push({
         start: url.start,
         end: url.end,
-        replacement: `<a href="${urlText}">${urlText}</a>`,
+        replacement: `<a href="${fullUrl}" class="url-link"><i data-lucide="link" class="match-icon"></i>${fullUrl}</a>`,
         type: 'url'
       });
     }

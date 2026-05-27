@@ -1,4 +1,13 @@
 export class UrlAlphabet {
+  static readonly VALID_TLDS = new Set([
+    'com', 'org', 'net', 'edu', 'gov', 'mil', 'io', 'co', 'me', 'info',
+    'biz', 'pro', 'aero', 'cat', 'coop', 'jobs', 'mobi', 'museum', 'name',
+    'tel', 'travel', 'xxx', 'asia', 'eu', 'uk', 'us', 'fr', 'de', 'es',
+    'it', 'nl', 'be', 'at', 'ch', 'pl', 'cz', 'hu', 'gr', 'pt', 'se',
+    'no', 'dk', 'fi', 'ie', 'ru', 'ua', 'cn', 'jp', 'kr', 'in', 'au',
+    'nz', 'ca', 'mx', 'br', 'ar', 'cl', 'co', 've', 'pe', 'uy'
+  ]);
+
   static isAlphanumeric(char: string): boolean {
     const code = char.charCodeAt(0);
     return (code >= 48 && code <= 57)
@@ -24,5 +33,15 @@ export class UrlAlphabet {
       return { scheme: 'www.', length: 4 };
     }
     return null;
+  }
+
+  static isValidTld(suffix: string): boolean {
+    return this.VALID_TLDS.has(suffix.toLowerCase());
+  }
+
+  static extractTld(domain: string): string | null {
+    const lastDot = domain.lastIndexOf('.');
+    if (lastDot === -1 || lastDot === domain.length - 1) return null;
+    return domain.substring(lastDot + 1);
   }
 }

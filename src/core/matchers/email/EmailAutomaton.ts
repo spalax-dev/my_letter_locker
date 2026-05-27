@@ -12,12 +12,14 @@ export class EmailAutomaton {
   private startPos: number = 0;
   private emails: { start: number; end: number }[] = [];
   private content: string = '';
+  private currentTld: string = '';
 
   reset(): void {
     this.state = Q0;
     this.startPos = 0;
     this.emails = [];
     this.content = '';
+    this.currentTld = '';
   }
 
   setContent(content: string): void {
@@ -45,27 +47,27 @@ export class EmailAutomaton {
       }
       case Q_DOMAIN: {
         if (EmailAlphabet.isAtSign(char)) {
-          this.emails.push({ start: this.startPos, end: pos });
           this.startPos = pos;
         } else if (EmailAlphabet.isDot(char)) {
           this.state = Q_DONE;
         } else if (!EmailAlphabet.isAlphanumeric(char)) {
-          if (this.startPos > 0) {
-            console.info(`Email pattern at position ${this.startPos} is invalid for parsing`);
-          }
-          this.emails.push({ start: this.startPos, end: pos });
           this.state = Q0;
         }
         break;
       }
       case Q_DONE: {
         if (EmailAlphabet.isAlphanumeric(char)) {
-          this.state = Q_DOMAIN;
-        } else if (!EmailAlphabet.isAlphanumeric(char) && !EmailAlphabet.isDot(char)) {
-          if (this.startPos > 0) {
-            console.info(`Email pattern at position ${this.startPos} is invalid for parsing`);
+          this.currentTld += char;
+        } else if (EmailAlphabet.isDot(char)) {
+          this.currentTld = '';
+        } else {
+          if (this.currentTld.length > 0 && EmailAlphabet.isValidTld(this.currentTld)) {
+            this.emails.push({ start: this.startPos, end: pos });
+            console.log(`Email pattern detected: ${this.content.substring(this.startPos, pos)} (position ${this.startPos})`);
+          } else if (this.currentTld.length > 0) {
+            console.info(`Email at position ${this.startPos} has invalid TLD: ${this.currentTld}`);
           }
-          this.emails.push({ start: this.startPos, end: pos });
+          this.currentTld = '';
           this.state = Q0;
         }
         break;
@@ -74,11 +76,13 @@ export class EmailAutomaton {
   }
 
   finalize(pos: number): void {
-    if (this.state !== Q0 && this.startPos > 0) {
-      console.info(`Email pattern at position ${this.startPos} is invalid for parsing (not completed)`);
-    }
-    if (this.state === Q_DOMAIN || this.state === Q_DONE) {
-      this.emails.push({ start: this.startPos, end: pos });
+    if (this.state === Q_DONE && this.currentTld.length > 0) {
+      if (EmailAlphabet.isValidTld(this.currentTld)) {
+        this.emails.push({ start: this.startPos, end: pos });
+        console.log(`Email pattern detected: ${this.content.substring(this.startPos, pos)} (position ${this.startPos})`);
+      } else {
+        console.info(`Email at position ${this.startPos} has invalid TLD: ${this.currentTld}`);
+      }
     }
   }
 

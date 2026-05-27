@@ -34,4 +34,24 @@ describe('DateMatcher', () => {
     const result = matcher.match('Sin fechas aqui');
     expect(result).toEqual([]);
   });
+
+  it('rejects month > 12', () => {
+    const result = matcher.match('Evento 25/13/2024');
+    expect(result).toEqual([]);
+  });
+
+  it('rejects day > 31', () => {
+    const result = matcher.match('Evento 32/12/2024');
+    expect(result).toEqual([]);
+  });
+
+  it('rejects YYYY-MM-DD invalid month', () => {
+    const result = matcher.match('Evento 2024-13-25');
+    expect(result).toEqual([]);
+  });
+
+  it('rejects YYYY-MM-DD invalid day', () => {
+    const result = matcher.match('Evento 2024-12-32');
+    expect(result).toEqual([]);
+  });
 });

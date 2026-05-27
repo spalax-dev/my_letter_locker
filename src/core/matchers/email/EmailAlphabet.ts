@@ -1,4 +1,8 @@
+import { UrlAlphabet } from '../url/UrlAlphabet';
+
 export class EmailAlphabet {
+  static readonly VALID_TLDS = UrlAlphabet.VALID_TLDS;
+
   static isAlphanumeric(char: string): boolean {
     const code = char.charCodeAt(0);
     return (code >= 48 && code <= 57)
@@ -12,5 +16,9 @@ export class EmailAlphabet {
 
   static isDot(char: string): boolean {
     return char === '.';
+  }
+
+  static isValidTld(suffix: string): boolean {
+    return suffix.length >= 2 && this.VALID_TLDS.has(suffix.toLowerCase());
   }
 }
