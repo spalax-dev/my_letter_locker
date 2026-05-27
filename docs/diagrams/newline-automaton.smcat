@@ -1,0 +1,10 @@
+initial,
+Q0,
+Q1,
+final;
+
+Q0 => Q1: "\n" [newline]
+Q1 => Q0: "\n" [continuar]
+Q0 => Q0: "[no-newline]" [otro]
+Q1 => Q1: "[no-newline]" [otro]
+final;

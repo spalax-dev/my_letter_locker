@@ -9,6 +9,7 @@ import { compressToUrlSafe } from "../../../utils/compression";
 import { CommandMatcher } from "../../../core/matchers/command/CommandMatcher";
 import { UrlMatcher } from "../../../core/matchers/url/UrlMatcher";
 import { EmailMatcher } from "../../../core/matchers/email/EmailMatcher";
+import { DateMatcher } from "../../../core/matchers/date/DateMatcher";
 import type { Replacement } from "../../../core/automaton/types";
 
 import { EditorView, keymap, highlightActiveLine, highlightSpecialChars, Decoration } from '@codemirror/view';
@@ -22,6 +23,7 @@ export class WriterView implements View {
   private commandMatcher = new CommandMatcher();
   private urlMatcher = new UrlMatcher();
   private emailMatcher = new EmailMatcher();
+  private dateMatcher = new DateMatcher();
 
   private shareModal!: HTMLDivElement;
   private encryptionToggle!: HTMLInputElement;
@@ -265,6 +267,17 @@ export class WriterView implements View {
       builder.add(email.start, email.end, Decoration.mark({
         class: 'cmd-email',
         attributes: { 'data-email': doc.substring(email.start, email.end) }
+      }));
+    }
+
+    const dateResults = this.dateMatcher.match(doc) as Replacement[];
+    if (dateResults.length > 0) {
+      console.log('[Pattern] Dates found:', dateResults.map(r => doc.substring(r.start, r.end)));
+    }
+    for (const date of dateResults) {
+      builder.add(date.start, date.end, Decoration.mark({
+        class: 'cmd-date',
+        attributes: { 'data-date': doc.substring(date.start, date.end) }
       }));
     }
 

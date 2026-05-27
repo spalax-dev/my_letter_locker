@@ -50,6 +50,9 @@ export class EmailAutomaton {
         } else if (EmailAlphabet.isDot(char)) {
           this.state = Q_DONE;
         } else if (!EmailAlphabet.isAlphanumeric(char)) {
+          if (this.startPos > 0) {
+            console.info(`Email pattern at position ${this.startPos} is invalid for parsing`);
+          }
           this.emails.push({ start: this.startPos, end: pos });
           this.state = Q0;
         }
@@ -59,6 +62,9 @@ export class EmailAutomaton {
         if (EmailAlphabet.isAlphanumeric(char)) {
           this.state = Q_DOMAIN;
         } else if (!EmailAlphabet.isAlphanumeric(char) && !EmailAlphabet.isDot(char)) {
+          if (this.startPos > 0) {
+            console.info(`Email pattern at position ${this.startPos} is invalid for parsing`);
+          }
           this.emails.push({ start: this.startPos, end: pos });
           this.state = Q0;
         }
@@ -68,6 +74,9 @@ export class EmailAutomaton {
   }
 
   finalize(pos: number): void {
+    if (this.state !== Q0 && this.startPos > 0) {
+      console.info(`Email pattern at position ${this.startPos} is invalid for parsing (not completed)`);
+    }
     if (this.state === Q_DOMAIN || this.state === Q_DONE) {
       this.emails.push({ start: this.startPos, end: pos });
     }

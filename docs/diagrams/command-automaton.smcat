@@ -1,0 +1,6 @@
+initial, inicio, leer, valor_inline, valor_linea, final;
+inicio => leer: "$" [inicio comando];
+leer => valor_inline: "$" [comando inline];
+leer => valor_linea: "newline" [comando línea];
+valor_inline => inicio: "$" [fin inline];
+valor_linea => inicio: "newline" [fin línea];

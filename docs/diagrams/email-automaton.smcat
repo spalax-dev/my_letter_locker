@@ -1,0 +1,16 @@
+initial,
+Q0,
+Q_LOCAL,
+Q_DOMAIN,
+Q_DONE,
+final;
+
+Q0 => Q_LOCAL: "[a-zA-Z0-9]" [inicio local]
+Q_LOCAL => Q_DOMAIN: "@"
+Q_LOCAL => Q0: "[otro]" [fallo local]
+Q_DOMAIN => Q_DONE: "." [TLD]
+Q_DOMAIN => Q_DOMAIN: "[a-zA-Z0-9.-]"
+Q_DOMAIN => Q0: "[otro]" [fin dominio]
+Q_DONE => Q_DOMAIN: "[a-zA-Z0-9]" [continuar]
+Q_DONE => Q0: "[otro]" [fallo]
+final;

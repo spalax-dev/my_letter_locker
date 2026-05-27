@@ -39,6 +39,9 @@ export class UrlAutomaton {
         if (char === '/') {
           this.state = Q_PATH;
         } else if (!UrlAlphabet.isUrlChar(char)) {
+          if (this.state !== Q0 && this.startPos > 0) {
+            console.info(`URL pattern at position ${this.startPos} is invalid for parsing`);
+          }
           this.urls.push({ start: this.startPos, end: pos });
           this.state = Q0;
         }
@@ -46,6 +49,9 @@ export class UrlAutomaton {
       }
       case Q_PATH: {
         if (!UrlAlphabet.isUrlChar(char)) {
+          if (this.state !== Q0 && this.startPos > 0) {
+            console.info(`URL pattern at position ${this.startPos} is invalid for parsing`);
+          }
           this.urls.push({ start: this.startPos, end: pos });
           this.state = Q0;
         }

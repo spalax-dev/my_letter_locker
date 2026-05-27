@@ -2,6 +2,7 @@
 
 
 \usepackage[spanish]{babel}
+\usepackage{amsmath,amssymb}
 \usepackage{caption}
 \usepackage{csquotes} 
 \usepackage[style=apa]{biblatex}
@@ -9,6 +10,7 @@
 \usepackage{microtype}
 \usepackage{float}
 \usepackage{graphicx}
+\usepackage{svg}
 \usepackage{indentfirst}
 \usepackage{booktabs}
 \usepackage{setspace}
@@ -17,7 +19,7 @@
 \usepackage{lipsum}
 \usepackage{tabularx}
 
-\setmainfont{Arimo}
+% \setmainfont{Arimo}
 \doublespacing
 \addbibresource{ref.bib}
 \graphicspath{{images/}}
@@ -62,6 +64,61 @@
 
 \tableofcontents
 \newpage
+
+% ==================================
+\section{Introducción teórica}
+\label{sec:intro-teorica}
+
+La Teoría de Lenguajes Formales proporciona los fundamentos matemáticos para el procesamiento automático de texto y el análisis sintáctico~\cite{hopcroft2008introduction}. Esta sección presenta los conceptos formales que sustentan el diseño e implementación de \emph{My Letter Locker}.
+
+\subsection{Autómatas finitos}
+Un autómata finito es un modelo matemático abstracto compuesto por cinco elementos: una tupla $(Q, \Sigma, \delta, q_0, F)$, donde:
+
+\begin{itemize}
+    \item $Q$ es un conjunto finito de estados.
+    \item $\Sigma$ es un alfabeto finito de símbolos de entrada.
+    \item $\delta: Q \times \Sigma \rightarrow Q$ es la función de transición.
+    \item $q_0 \in Q$ es el estado inicial.
+    \item $F \subseteq Q$ es el conjunto de estados de aceptación.
+\end{itemize}
+
+Según \textcite{sipser2012introduction}, un autómata finito determina si una cadena de entrada pertenece a un lenguaje dado, procesando la entrada símbolo a símbolo y modificando su estado interno según las transiciones definidas.
+
+Los autómatas finitos se clasifican en:
+
+\begin{itemize}
+    \item \textbf{Deterministas (AFD):} Para cada par $(q, a)$ existe exactamente una transición.
+    \item \textbf{No deterministas (AFN):} Pueden existir múltiples transiciones o transiciones con símbolos vacíos ($\epsilon$).
+\end{itemize}
+
+Todo AFN puede convertirse en un AFD equivalente mediante el algoritmo de construcción de subconjuntos~\cite{hopcroft2008introduction}.
+
+\subsection{Alfabetos y lenguajes}
+Un \textbf{alfabeto} $\Sigma$ es un conjunto finito no vacío de símbolos~\cite{linz2012introduction}. Un \textbf{lenguaje} $L$ sobre un alfabeto $\Sigma$ es un subconjunto de $\Sigma^*$, donde $\Sigma^*$ denotes el conjunto de todas las cadenas (incluyendo la cadena vacía $\epsilon$) formadas por símbolos de $\Sigma$.
+
+La operación de concatenación y el operador Kleene permiten construir nuevos lenguajes a partir de existentes:
+
+\begin{itemize}
+    \item $L_1 L_2 = \{xy \mid x \in L_1, y \in L_2\}$
+    \item $L^* = \bigcup_{i=0}^{\infty} L^i$ (clausura de Kleene)
+\end{itemize}
+
+\subsection{Relación entre autómatas y expresiones regulares}
+Un resultado fundamental de la teoría de lenguajes formales establece que los lenguajes reconocidos por autómatas finitos son exactamente aquellos que pueden describirse mediante expresiones regulares~\cite{hopcroft2008introduction}. Esta equivalencia permite utilizar autómatas para implementar reconocedores de patrones definidos declarativamente.
+
+Sin embargo, en la implementación práctica de \textcite{thompson1968programming}, las expresiones regulares se compilan internamente en autómatas finitos no deterministas (AFN) y posteriormente en AFD para su ejecución eficiente. Este proceso de compilación es transparente para el usuario, quien define patrones mediante una notación declarativa.
+
+\subsection{Diseño de autómatas personalizados}
+El diseño de un autómata para reconocer un lenguaje específico requiere definir~\cite{kelley1995automata}:
+
+\begin{enumerate}
+    \item \textbf{Alfabeto:} El conjunto de símbolos que el autómata puede procesar.
+    \item \textbf{Estados:} La representación del estado de procesamiento en cada punto.
+    \item \textbf{Transiciones:} Las reglas que determinan el siguiente estado dado el estado actual y el símbolo de entrada.
+    \item \textbf{Estados de aceptación:} Identificación de los estados que representan éxito en el reconocimiento.
+\end{enumerate}
+
+La implementación de autómatas en software permite procesamiento en tiempo real, donde cada carácter de entrada se procesa secuencialmente y el resultado se genera incrementally~\cite{gusfield1997algorithms}.
 
 % ==================================
 \addcontentsline{toc}{section}{Introducción}
@@ -124,13 +181,13 @@ En las siguientes tablas se detallan los requisitos técnicos y funcionales del 
 El desarrollo de \emph{My Letter Locker} se fundamenta en una arquitectura modular que separa claramente los componentes de análisis sintáctico, cifrado, compresión y visualización. Esta sección describe los patrones reconocidos mediante autómatas finitos, las tecnologías utilizadas, la estructura del proyecto y el diseño de la interfaz.
 
 \subsection{Patrones a identificar}
-La aplicación reconoce patrones mediante autómatas finitos implementados en TypeScript dentro del módulo \texttt{core/}. Cada autómata se acompaña de un alfabeto personalizado que define los símbolos válidos, y de un matcher que coordina su ejecución.
+Como se describió en la Sección~\ref{sec:intro-teorica}, la aplicación reconoce patrones mediante autómatas finitos. El diseño de cada autómata sigue los principios definidos en~\cite{kelley1995automata}, con un alfabeto personalizado y un matcher que coordina su ejecución.
 
 Un alfabeto define los caracteres reconocibles y las transiciones válidas entre estados, proporcionando una separación clara entre la lógica del autómata y los datos que procesa. Por ejemplo:
 
 \begin{itemize}
     \item \texttt{CommandAlphabet} define métodos estáticos para identificar símbolos de inicio/final (\texttt{\$}), caracteres alfabéticos, dígitos y niveles de título.
-    \item \texttt{UrlAlphabet} define la validación de esquemas de URL, reconociendoprefijos como \texttt{http://}, \texttt{https://} y \texttt{www.}, además de caracteres válidos en URLs (alfanuméricos, guiones, puntos, двоеточие, barras, etc.).
+    \item \texttt{UrlAlphabet} define la validación de esquemas de URL, reconociendo prefijos como \texttt{http://}, \texttt{https://} y \texttt{www.}, además de caracteres válidos en URLs (alfanuméricos, guiones, puntos, dos puntos, barras, etc.).
 \end{itemize}
 
 \subsubsection{Comandos de formato}
@@ -152,14 +209,114 @@ Comandos reconocidos:
     \item \texttt{\$title:n\$ texto} — Encabezado nivel $n$ (2 a 6).
 \end{itemize}
 
-El autómata reconocedor de comandos utiliza cuatro estados (Q0, Q1, Q2, Q3) para manejar tanto comandos inline como de línea, diferenciando la sintaxis según el contexto. La Figura~\ref{fig:automata-comandos} ilustra el diagrama de estados.
+Los autómatas reconocedores implementados en el proyecto son:
+
+\subsection{CommandAutomaton}
+
+El \textbf{CommandAutomaton} reconoce comandos de formato delimitados por el símbolo \texttt{\$}. Se define formalmente como la quíntupla:
+
+\[
+M_{cmd} = (Q, \Sigma, \delta, q_0, F)
+\]
+
+donde:
+
+\begin{itemize}
+    \item $Q = \{Q_0, Q_1, Q_2, Q_3\}$: Conjunto finito de 4 estados.
+    \item $\Sigma = \{\$, a-z, A-Z, 0-9, \textbackslash n\}$: Alfabeto de entrada incluyendo el delimitador de comando, caracteres alfanuméricos y fin de línea.
+    \item $q_0 = Q_0$: Estado inicial donde el autómata busca el inicio de un comando.
+    \item $F = \{Q_0\}$: Conjunto de estados de aceptación.
+\end{itemize}
+
+La función de transición $\delta: Q \times \Sigma \rightarrow Q$ reconoce comandos en dos modalidades:
+
+\begin{enumerate}
+    \item \textbf{Comandos inline:} Sintaxis \texttt{\$nombre\$valor\$}. El valor se captura entre los delimitadores \texttt{\$}. Ejemplo: \texttt{\$bold\$texto\$} produce texto en negrita.
+    \item \textbf{Comandos de línea:} Sintaxis \texttt{\$nombre\$valor} terminados por newline o fin de texto. Ejemplo: \texttt{\$title\$Encabezado} produce un título.
+\end{enumerate}
+
+El flujo de estados es:
+\begin{itemize}
+    \item $Q_0 \xrightarrow{\$} Q_1$: Detecta inicio de comando.
+    \item $Q_1 \xrightarrow{\$ \text{(comando inline)}} Q_2$: Identifica comando inline.
+    \item $Q_1 \xrightarrow{\$ \text{(comando línea)}} Q_3$: Identifica comando de línea.
+    \item $Q_2 \xrightarrow{\$} Q_0$: Finaliza comando inline al cerrar con \texttt{\$}.
+    \item $Q_3 \xrightarrow{\textbackslash n} Q_0$: Finaliza comando de línea al encontrar newline.
+\end{itemize}
 
 \begin{figure}[H]
     \centering
-    \includegraphics[height=6cm]{automata-comandos.png}
-    \caption{Diagrama de estados del autómata reconocedor de comandos}
-    \label{fig:automata-comandos}
+    \includegraphics[width=\textwidth,height=8cm,keepaspectratio]{command-automaton.png}
+    \caption{Diagrama de estados del CommandAutomaton. Estados: $Q_0$ (inicial, buscando inicio de comando), $Q_1$ (leyendo nombre del comando), $Q_2$ (capturando valor para comando inline), $Q_3$ (capturando valor para comando de línea). El autómata distingue entre comandos inline (\$nombre\$valor\$) y comandos de línea (\$nombre\$valor seguido de newline).}
+    \label{fig:command-automaton}
 \end{figure}
+
+\subsection{EmailAutomaton}
+
+El \textbf{EmailAutomaton} valida direcciones de correo electrónico según el formato \texttt{local@dominio.tld}:
+
+\[
+M_{email} = (Q, \Sigma, \delta, q_0, F)
+\]
+
+donde:
+
+\begin{itemize}
+    \item $Q = \{Q_0, Q_{local}, Q_{dominio}, Q_{tld}\}$: Estados que representan las fases de reconocimiento del correo.
+    \item $\Sigma$: Caracteres alfanuméricos, punto (\texttt{.}), arroba (\texttt{@}), guión bajo (\texttt{\_}) y signo más (\texttt{+}).
+    \item $q_0 = Q_0$: Estado inicial.
+    \item $F = \{Q_{dominio}, Q_{tld}\}$: Estados de aceptación.
+\end{itemize}
+
+El reconocimiento sigue la estructura:
+
+\begin{enumerate}
+    \item \textbf{Fase local} ($Q_{local}$): Captura la parte local del correo (antes del \texttt{@}). Acepta caracteres alfanuméricos, punto, guión y plus.
+    \item \textbf{Fase dominio} ($Q_{dominio}$): Captura el dominio (después del \texttt{@}). Reconoce subdominios separados por puntos.
+    \item \textbf{Fase TLD} ($Q_{tld}$): Captura la extensión del dominio (ej: com, org, edu.co).
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=8cm,keepaspectratio]{email-automaton.png}
+    \caption{Diagrama de estados del EmailAutomaton. $Q_0$ espera el inicio de un correo. $Q_{local}$ captura la parte local. $Q_{dominio}$ procesa el dominio después del \texttt{@}. $Q_{tld}$ captura la extensión TLD después del punto final del dominio. El autómata acepta la dirección al detectar un punto en el dominio seguido de caracteres alfanuméricos.}
+    \label{fig:email-automaton}
+\end{figure}
+
+\subsection{UrlAutomaton}
+
+El \textbf{UrlAutomaton} reconoce URLs con esquema \texttt{http://}, \texttt{https://} o \texttt{www.}:
+
+\[
+M_{url} = (Q, \Sigma, \delta, q_0, F)
+\]
+
+donde:
+
+\begin{itemize}
+    \item $Q = \{Q_0, Q_{esquema}, Q_{dominio}, Q_{ruta}\}$: Estados para cada fase del reconocimiento de URL.
+    \item $\Sigma$: Caracteres válidos en URLs: alfanuméricos, guión, punto, dos puntos, barra, signo de interrogación, numeral, ampersand, igual, porcentaje.
+    \item $q_0 = Q_0$: Estado inicial.
+    \item $F = \{Q_{dominio}, Q_{ruta}\}$: Estados de aceptación.
+\end{itemize}
+
+El reconocimiento proceeds como:
+
+\begin{enumerate}
+    \item \textbf{Detección de esquema} ($Q_{esquema}$): Identifica \texttt{http://}, \texttt{https://} o \texttt{www.}
+    \item \textbf{Captura de dominio} ($Q_{dominio}$): Procesa el nombre de dominio incluyendo subdominios y guiones.
+    \item \textbf{Captura de ruta} ($Q_{ruta}$): Captura la ruta del recurso después del primer \texttt{/}.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=8cm,keepaspectratio]{url-automaton.png}
+    \caption{Diagrama de estados del UrlAutomaton. $Q_0$ detecta el esquema (http, https o www). $Q_{dominio}$ procesa el nombre de dominio. $Q_{ruta}$ captura la ruta del recurso después del primer slash.}
+    \label{fig:url-automaton}
+\end{figure}
+
+Los diagramas de estados fueron generados automáticamente a partir de la especificación formal utilizando la herramienta \texttt{state-machine-cat}.
+
 
 \subsubsection{Datos estructurados}
 Los matchers de datos emplean autómatas específicos para validar:
@@ -234,7 +391,7 @@ La aplicación se divide en dos vistas principales:
 
     \begin{figure}[H]
         \centering
-        \includegraphics[height=8cm]{mockup-reader.png}
+        \includegraphics[height=12cm]{mockup-reader.png}
         \caption{Mockup de la interfaz Reader}
         \label{fig:mockup-reader}
     \end{figure}
@@ -256,17 +413,85 @@ El flujo inverso (descifrado) invierte estos pasos: descifrar, descomprimir y pr
 
 
 % ==================================
-
 \section{Evidencias}
-\lipsum[5]
+En esta sección se presentan las capturas de pantalla y pruebas funcionales que demuestran la correcta implementación del sistema.
+
+\subsection{Interfaz Writer}
+La Figura~\ref{fig:ev-writer} muestra la interfaz de redacción con el editor de texto enriquecido, la barra de herramientas y las opciones de compartición.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=9cm]{ev-writer.png}
+    \caption{Captura de la interfaz Writer}
+    \label{fig:ev-writer}
+\end{figure}
+
+\subsection{Interfaz Reader}
+La Figura~\ref{fig:ev-reader} presenta la pantalla de desbloqueo donde el destinatario ingresa la palabra secreta.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=9cm]{ev-reader.png}
+    \caption{Captura de la interfaz Reader pidiendo palabra secreta}
+    \label{fig:ev-reader}
+\end{figure}
+
+\subsection{Lectura del mensaje descifrado}
+La Figura~\ref{fig:ev-decrypted} muestra el contenido descifrado y renderizado con los comandos de formato aplicados.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=9cm]{ev-decrypted.png}
+    \caption{Mensaje descifrado con formato}
+    \label{fig:ev-decrypted}
+\end{figure}
+
+\subsection{Compartición de carta}
+La Figura~\ref{fig:ev-share} evidencia la generación del enlace con contenido cifrado embebido y las opciones de compartición disponibles.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[height=9cm]{ev-share.png}
+    \caption{Ventana de compartición con enlace cifrado}
+    \label{fig:ev-share}
+\end{figure}
 
 % ==================================
-\section{Conclusiones}
 
-\lipsum[8]
+\section{Conclusiones}
+El desarrollo de \emph{My Letter Locker} demuestra la aplicación práctica de los conceptos de teoría de lenguajes formales en un sistema real. A través de autómatas finitos personalizados, la aplicación logra reconocer y procesar comandos de formato y datos estructurados sin necesidad de expresiones regulares externas.
+
+Los principales logros del proyecto incluyen:
+
+\begin{itemize}
+    \item \textbf{Arquitectura modular:} La separación clara entre autómatas, matchers y servicios permite un código mantenible y extensible. Cada componente tiene responsabilidad específica.
+    
+    \item \textbf{Cifrado autenticado:} El uso de AES-GCM con PBKDF2 garantiza tanto la confidencialidad como la integridad de los mensajes, protegiendo contra manipulación no autorizada.
+    
+    \item \textbf{Compresión eficiente:} La integración de gzip mediante la biblioteca Pako permite compartir mensajes de hasta 60\,000 caracteres mediante URLs, superando las limitaciones habituales de longitud de enlaces.
+    
+    \item \textbf{Sin servidor:} El diseño elimina la necesidad de almacenamiento permanente, reduciendo costos y complejidad operacional. Toda la información se embebe en la URL.
+    
+    \item \textbf{Sintaxis declarativa:} Los comandos de formato inspirados en LaTeX proporcionan una notación familiar para redactores técnicos, con una gramática simple pero expresiva.
+\end{itemize}
+
+El proyecto evidencia cómo los fundamentos teóricos de autómatas y lenguajes formales permiten construir soluciones elegantes a problemas prácticos de procesamiento de texto.
+
+\subsection{Trabajo futuro}
+Como líneas de mejora para futuras iteraciones se identifican:
+
+\begin{itemize}
+    \item Soporte para adjuntos e imágenes embebidas mediante codificación Base64.
+    \item Historial de versiones con diferenciación criptográfica.
+    \item Integración con servicios de almacenamiento distribuido (IPFS, Arweave).
+    \item Comandos adicionales: listas, citas, código fuente con sintaxis coloreada.
+    \item Internacionalización y temas visuales personalizables.
+\end{itemize}
 
 % ================= BIBLIOGRAFÍA =================
 \newpage
+\section{Bibliografía}
+
 \printbibliography
 
 \end{document}

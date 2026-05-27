@@ -89,6 +89,7 @@ body {
 
 .dark .modal-card {
   background-color: #2A2A2A;
+  border: 1px solid var(--color-border-strong);
 }
 
 .modal-card--sm {

@@ -6,19 +6,22 @@ export class ImplicitAnalyzer {
   private tabMatcher: Matcher;
   private urlMatcher: Matcher;
   private emailMatcher: Matcher;
+  private dateMatcher: Matcher;
 
   constructor(
     commandMatcher: Matcher,
     newlineMatcher: Matcher,
     tabMatcher: Matcher,
     urlMatcher: Matcher,
-    emailMatcher: Matcher
+    emailMatcher: Matcher,
+    dateMatcher: Matcher
   ) {
     this.commandMatcher = commandMatcher;
     this.newlineMatcher = newlineMatcher;
     this.tabMatcher = tabMatcher;
     this.urlMatcher = urlMatcher;
     this.emailMatcher = emailMatcher;
+    this.dateMatcher = dateMatcher;
   }
 
   analyze(content: string): string {
@@ -29,13 +32,15 @@ export class ImplicitAnalyzer {
     const tabReplacements = this.filterUncovered(this.tabMatcher.match(content), coveredRegions);
     const urlReplacements = this.filterUncovered(this.urlMatcher.match(content), coveredRegions);
     const emailReplacements = this.filterUncovered(this.emailMatcher.match(content), coveredRegions);
+    const dateReplacements = this.filterUncovered(this.dateMatcher.match(content), coveredRegions);
 
     const allReplacements = [
       ...commandReplacements,
       ...newlineReplacements,
       ...tabReplacements,
       ...urlReplacements,
-      ...emailReplacements
+      ...emailReplacements,
+      ...dateReplacements
     ].sort((a, b) => b.start - a.start);
 
     return this.applyReplacements(content, allReplacements);

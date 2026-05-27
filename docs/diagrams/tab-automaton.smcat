@@ -1,0 +1,10 @@
+initial,
+Q0,
+Q1,
+final;
+
+Q0 => Q1: "\t" [tab]
+Q1 => Q0: "\t" [continuar]
+Q0 => Q0: "[no-tab]" [otro]
+Q1 => Q1: "[no-tab]" [otro]
+final;

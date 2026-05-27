@@ -1,0 +1,14 @@
+initial,
+Q0,
+Q_DOMAIN,
+Q_PATH,
+final;
+
+Q0 => Q_DOMAIN: "https://" / esquema https
+Q0 => Q_DOMAIN: "http://" / esquema http
+Q0 => Q_DOMAIN: "www." / esquema www
+Q_DOMAIN => Q_PATH: "/" [ruta]
+Q_DOMAIN => Q0: "[no-url]" [fallo dominio]
+Q_PATH => Q_PATH: "[chars-url]"
+Q_PATH => Q0: "[no-url]" [fin URL]
+final;

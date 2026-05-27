@@ -4,5 +4,9 @@ import { defineConfig } from 'vite';
 export default defineConfig({
   plugins: [
     tailwindcss()
-  ]
+  ],
+  base: './',
+  build: {
+    outDir: 'build/dist'
+  }
 });

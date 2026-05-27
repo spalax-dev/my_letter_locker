@@ -1,0 +1,107 @@
+Los autómatas reconocedores implementados en el proyecto son:
+
+\subsection{CommandAutomaton}
+
+El \textbf{CommandAutomaton} reconoce comandos de formato delimitados por el símbolo \texttt{\$}. Se define formalmente como la quíntupla:
+
+\[
+M_{cmd} = (Q, \Sigma, \delta, q_0, F)
+\]
+
+donde:
+
+\begin{itemize}
+    \item $Q = \{Q_0, Q_1, Q_2, Q_3\}$: Conjunto finito de 4 estados.
+    \item $\Sigma = \{\$, a-z, A-Z, 0-9, \textbackslash n\}$: Alfabeto de entrada incluyendo el delimitador de comando, caracteres alfanuméricos y fin de línea.
+    \item $q_0 = Q_0$: Estado inicial donde el autómata busca el inicio de un comando.
+    \item $F = \{Q_0\}$: Conjunto de estados de aceptación.
+\end{itemize}
+
+La función de transición $\delta: Q \times \Sigma \rightarrow Q$ reconoce comandos en dos modalidades:
+
+\begin{enumerate}
+    \item \textbf{Comandos inline:} Sintaxis \texttt{\$nombre\$valor\$}. El valor se captura entre los delimitadores \texttt{\$}. Ejemplo: \texttt{\$bold\$texto\$} produce texto en negrita.
+    \item \textbf{Comandos de línea:} Sintaxis \texttt{\$nombre\$valor} terminados por newline o fin de texto. Ejemplo: \texttt{\$title\$Encabezado} produce un título.
+\end{enumerate}
+
+El flujo de estados es:
+\begin{itemize}
+    \item $Q_0 \xrightarrow{\$} Q_1$: Detecta inicio de comando.
+    \item $Q_1 \xrightarrow{\$ \text{(comando inline)}} Q_2$: Identifica comando inline.
+    \item $Q_1 \xrightarrow{\$ \text{(comando línea)}} Q_3$: Identifica comando de línea.
+    \item $Q_2 \xrightarrow{\$} Q_0$: Finaliza comando inline al cerrar con \texttt{\$}.
+    \item $Q_3 \xrightarrow{\textbackslash n} Q_0$: Finaliza comando de línea al encontrar newline.
+\end{itemize}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=8cm,keepaspectratio]{command-automaton.png}
+    \caption{Diagrama de estados del CommandAutomaton. Estados: $Q_0$ (inicial, buscando inicio de comando), $Q_1$ (leyendo nombre del comando), $Q_2$ (capturando valor para comando inline), $Q_3$ (capturando valor para comando de línea). El autómata distingue entre comandos inline (\$nombre\$valor\$) y comandos de línea (\$nombre\$valor seguido de newline).}
+    \label{fig:command-automaton}
+\end{figure}
+
+\subsection{EmailAutomaton}
+
+El \textbf{EmailAutomaton} valida direcciones de correo electrónico según el formato \texttt{local@dominio.tld}:
+
+\[
+M_{email} = (Q, \Sigma, \delta, q_0, F)
+\]
+
+donde:
+
+\begin{itemize}
+    \item $Q = \{Q_0, Q_{local}, Q_{dominio}, Q_{tld}\}$: Estados que representan las fases de reconocimiento del correo.
+    \item $\Sigma$: Caracteres alfanuméricos, punto (\texttt{.}), arroba (\texttt{@}), guión bajo (\texttt{\_}) y signo más (\texttt{+}).
+    \item $q_0 = Q_0$: Estado inicial.
+    \item $F = \{Q_{dominio}, Q_{tld}\}$: Estados de aceptación.
+\end{itemize}
+
+El reconocimiento sigue la estructura:
+
+\begin{enumerate}
+    \item \textbf{Fase local} ($Q_{local}$): Captura la parte local del correo (antes del \texttt{@}). Acepta caracteres alfanuméricos, punto, guión y plus.
+    \item \textbf{Fase dominio} ($Q_{dominio}$): Captura el dominio (después del \texttt{@}). Reconoce subdominios separados por puntos.
+    \item \textbf{Fase TLD} ($Q_{tld}$): Captura la extensión del dominio (ej: com, org, edu.co).
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=8cm,keepaspectratio]{email-automaton.png}
+    \caption{Diagrama de estados del EmailAutomaton. $Q_0$ espera el inicio de un correo. $Q_{local}$ captura la parte local. $Q_{dominio}$ procesa el dominio después del \texttt{@}. $Q_{tld}$ captura la extensión TLD después del punto final del dominio. El autómata acepta la dirección al detectar un punto en el dominio seguido de caracteres alfanuméricos.}
+    \label{fig:email-automaton}
+\end{figure}
+
+\subsection{UrlAutomaton}
+
+El \textbf{UrlAutomaton} reconoce URLs con esquema \texttt{http://}, \texttt{https://} o \texttt{www.}:
+
+\[
+M_{url} = (Q, \Sigma, \delta, q_0, F)
+\]
+
+donde:
+
+\begin{itemize}
+    \item $Q = \{Q_0, Q_{esquema}, Q_{dominio}, Q_{ruta}\}$: Estados para cada fase del reconocimiento de URL.
+    \item $\Sigma$: Caracteres válidos en URLs: alfanuméricos, guión, punto, dos puntos, barra, signo de interrogación, numeral, ampersand, igual, porcentaje.
+    \item $q_0 = Q_0$: Estado inicial.
+    \item $F = \{Q_{dominio}, Q_{ruta}\}$: Estados de aceptación.
+\end{itemize}
+
+El reconocimiento proceeds como:
+
+\begin{enumerate}
+    \item \textbf{Detección de esquema} ($Q_{esquema}$): Identifica \texttt{http://}, \texttt{https://} o \texttt{www.}
+    \item \textbf{Captura de dominio} ($Q_{dominio}$): Procesa el nombre de dominio incluyendo subdominios y guiones.
+    \item \textbf{Captura de ruta} ($Q_{ruta}$): Captura la ruta del recurso después del primer \texttt{/}.
+\end{enumerate}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=8cm,keepaspectratio]{url-automaton.png}
+    \caption{Diagrama de estados del UrlAutomaton. $Q_0$ detecta el esquema (http, https o www). $Q_{dominio}$ procesa el nombre de dominio. $Q_{ruta}$ captura la ruta del recurso después del primer slash.}
+    \label{fig:url-automaton}
+\end{figure}
+
+Los diagramas de estados fueron generados automáticamente a partir de la especificación formal utilizando la herramienta \texttt{state-machine-cat}.

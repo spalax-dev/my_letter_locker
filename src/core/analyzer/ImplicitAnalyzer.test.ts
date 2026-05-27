@@ -5,6 +5,7 @@ import { NewlineMatcher } from '../matchers/newline/NewlineMatcher';
 import { TabMatcher } from '../matchers/tab/TabMatcher';
 import { UrlMatcher } from '../matchers/url/UrlMatcher';
 import { EmailMatcher } from '../matchers/email/EmailMatcher';
+import { DateMatcher } from '../matchers/date/DateMatcher';
 
 describe('ImplicitAnalyzer', () => {
   let analyzer: ImplicitAnalyzer;
@@ -15,7 +16,8 @@ describe('ImplicitAnalyzer', () => {
       new NewlineMatcher(),
       new TabMatcher(),
       new UrlMatcher(),
-      new EmailMatcher()
+      new EmailMatcher(),
+      new DateMatcher()
     );
   });
 

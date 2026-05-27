@@ -414,32 +414,63 @@
 }
 
 .modal-header {
-  @apply px-4 h-12 border-b border-primary/10 flex items-center justify-between bg-cream;
+  @apply px-4 h-12 border-b border-[var(--color-border)] flex items-center justify-between;
+  background-color: var(--color-bg-secondary);
+}
+
+.dark .modal-header {
+  background-color: var(--color-bg-secondary);
+  border-bottom-color: var(--color-border-strong);
 }
 
 .modal-title {
-  @apply flex items-center gap-2 text-sm font-semibold text-text;
+  @apply flex items-center gap-2 text-sm font-semibold h-full;
+  color: var(--color-text);
+}
+
+.dark .modal-title {
+  color: var(--color-text);
+}
+
+.modal-title h2 {
+  margin: 0;
+  line-height: 1;
 }
 
 .btn-close-modal {
-  @apply p-1.5 rounded-lg hover:bg-primary/5 text-text-secondary transition-colors duration-200 active:scale-95;
+  @apply p-1.5 rounded-lg hover:bg-[var(--color-surface-hover)] transition-colors duration-200 active:scale-95;
+  color: var(--color-text-secondary);
+}
+
+.dark .btn-close-modal {
+  color: var(--color-text-secondary);
 }
 
 .modal-content {
-  background-color: #FFFFFF;
-  @apply flex flex-col mt-4 overflow-y-auto px-4 py-2 text-text leading-relaxed whitespace-pre-line;
-}
-
-:root.dark .modal-content {
-  background-color: #2A2A2A;
+  @apply flex flex-col mt-4 overflow-y-auto px-4 py-2 leading-relaxed whitespace-pre-line;
+  background-color: var(--color-bg);
+  color: var(--color-text);
 }
 
 .modal-footer {
   @apply px-4 h-10 flex items-center justify-between;
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text);
+}
+
+.dark .modal-footer {
+  background-color: var(--color-bg-secondary);
 }
 
 .btn-primary-modal {
-  @apply px-4 py-1.5 bg-primary text-primary-light font-medium text-xs rounded-lg hover:bg-primary/90 transition-colors duration-200 active:scale-95;
+  @apply px-4 py-1.5 font-medium text-xs rounded-lg transition-colors duration-200 active:scale-95;
+  background-color: var(--color-primary);
+  color: var(--color-cream);
+}
+
+.dark .btn-primary-modal {
+  background-color: var(--color-primary);
+  color: var(--color-cream);
 }
 
 :root.dark .editor-container {
@@ -501,8 +532,23 @@
   @apply text-xs text-text-secondary mb-2;
 }
 
+.dark .share-description {
+  color: var(--color-text-secondary);
+}
+
 .share-btn-item {
   @apply flex items-center gap-3 w-full py-2 px-3 bg-[var(--color-bg-secondary)] border border-[var(--color-border)] rounded-lg text-[var(--color-text)] text-sm font-medium cursor-pointer transition-all duration-150;
+}
+
+.dark .share-btn-item {
+  background-color: var(--color-bg);
+  border-color: var(--color-border-strong);
+  color: var(--color-text);
+}
+
+.dark .key-input-field::placeholder {
+  color: var(--color-text-muted);
+  opacity: 0.7;
 }
 
 .share-btn-item[style*="pointer-events: none"] {
@@ -533,6 +579,10 @@
   margin-left: auto;
   flex-shrink: 0;
   opacity: 0.4;
+}
+
+.dark .share-btn-arrow {
+  opacity: 0.7;
 }
 
 .encryption-section {
@@ -571,9 +621,13 @@
   left: 0.1875rem;
   width: 1.25rem;
   height: 1.25rem;
-  background-color: white;
+  background-color: var(--color-bg);
   border-radius: 50%;
   transition: transform 0.2s ease;
+}
+
+.dark .toggle-switch::after {
+  background-color: var(--color-bg-secondary);
 }
 
 .toggle-input:checked + .toggle-switch {
@@ -641,4 +695,12 @@
 
 .heading-submenu-item:nth-child(2) {
   border-bottom: 1px solid var(--color-border);
+}
+
+.theme-toggle-btn {
+  @apply p-2 rounded transition-colors duration-150;
+}
+
+.theme-toggle-btn:hover {
+  background-color: var(--color-surface-hover);
 }
