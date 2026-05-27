@@ -8,3 +8,5 @@
 *.out
 *.xml
 *.toc
+*-SAVE-ERROR
+

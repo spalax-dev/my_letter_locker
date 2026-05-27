@@ -1,0 +1,146 @@
+Los autómatas reconocedores implementados en el proyecto son:
+
+\subsection{CommandAutomaton}
+
+El \textbf{CommandAutomaton} reconoce comandos de formato delimitados por el símbolo \texttt{\$}. Se define formalmente como la quíntupla:
+
+\[
+M_{cmd} = (Q, \Sigma, \delta, q_0, F)
+\]
+
+donde:
+\begin{itemize}
+    \item $Q = \{q_0, q_1, q_2, q_3\}$: Conjunto finito de estados.
+    \item $\Sigma = \{\$, \text{alnum}, \text{newline}\}$: Alfabeto de entrada.
+    \item $\delta$: Función de transición.
+    \item $q_0$: Estado inicial.
+    \item $F = \{q_0\}$: Estados de aceptación.
+\end{itemize}
+
+\textbf{Descripción de estados:}
+\begin{itemize}
+    \item $q_0$ (inicial): Busca el símbolo \texttt{\$} de inicio de comando.
+    \item $q_1$: Lee el nombre del comando.
+    \item $q_2$: Captura el valor para comandos inline (\$nombre\$valor\$).
+    \item $q_3$: Captura el valor para comandos de línea (\$nombre\$valor\n).
+\end{itemize}
+
+\textbf{Tabla de transiciones:}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Estado actual} & \textbf{Símbolo} & \textbf{Estado siguiente} \\
+\hline
+$q_0$ & \$ & $q_1$ \\
+$q_1$ & \$ & $q_2$ (inline) o $q_3$ (línea) \\
+$q_1$ & newline & $q_0$ \\
+$q_1$ & alnum & $q_1$ \\
+$q_2$ & \$ & $q_0$ \\
+$q_3$ & newline & $q_0$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=7cm,keepaspectratio]{command-automaton.png}
+    \caption{Diagrama de estados del CommandAutomaton.}
+    \label{fig:command-automaton}
+\end{figure}
+
+\subsection{EmailAutomaton}
+
+El \textbf{EmailAutomaton} valida correos en formato \texttt{local@dominio.tld}:
+
+\[
+M_{email} = (Q, \Sigma, \delta, q_0, F)
+\]
+
+donde:
+\begin{itemize}
+    \item $Q = \{q_0, q_{local}, q_{dominio}, q_{tld}, q_{error}\}$.
+    \item $\Sigma = \{\text{alnum}, @, ., \_, +, -\}$.
+    \item $q_0$: Estado inicial.
+    \item $F = \{q_{tld}\}$.
+\end{itemize}
+
+\textbf{Descripción de estados:}
+\begin{itemize}
+    \item $q_0$: Busca inicio de correo (carácter alfanumérico).
+    \item $q_{local}$: Captura la parte local (antes de @).
+    \item $q_{dominio}$: Procesa el dominio después de @.
+    \item $q_{tld}$: Captura la extensión del dominio. Estado de aceptación.
+    \item $q_{error}$: Estado de error para patrones inválidos.
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Estado actual} & \textbf{Símbolo} & \textbf{Estado siguiente} \\
+\hline
+$q_0$ & alnum & $q_{local}$ \\
+$q_{local}$ & @ & $q_{dominio}$ \\
+$q_{local}$ & alnum & $q_{local}$ \\
+$q_{dominio}$ & . & $q_{tld}$ \\
+$q_{dominio}$ & alnum & $q_{dominio}$ \\
+$q_{tld}$ & alnum & $q_{dominio}$ \\
+$q_{tld}$ & otro & $q_{error}$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=7cm,keepaspectratio]{email-automaton.png}
+    \caption{Diagrama de estados del EmailAutomaton.}
+    \label{fig:email-automaton}
+\end{figure}
+
+\subsection{UrlAutomaton}
+
+El \textbf{UrlAutomaton} reconoce URLs con esquema \texttt{http://}, \texttt{https://} o \texttt{www.}:
+
+\[
+M_{url} = (Q, \Sigma, \delta, q_0, F)
+\]
+
+donde:
+\begin{itemize}
+    \item $Q = \{q_0, q_{dominio}, q_{ruta}, q_{error}\}$.
+    \item $\Sigma = \{\text{http://}, \text{https://}, \text{www.}, \text{alnum}, /, ., -, :, ?, \&, =\}$.
+    \item $q_0$: Estado inicial.
+    \item $F = \{q_{dominio}, q_{ruta}\}$.
+\end{itemize}
+
+\textbf{Descripción de estados:}
+\begin{itemize}
+    \item $q_0$: Detecta el esquema de URL.
+    \item $q_{dominio}$: Captura el nombre de dominio (requiere al menos un punto y TLD válido).
+    \item $q_{ruta}$: Captura la ruta del recurso después de \texttt{/}.
+    \item $q_{error}$: Estado de error para URLs inválidas.
+\end{itemize}
+
+\begin{center}
+\begin{tabular}{|c|c|c|}
+\hline
+\textbf{Estado actual} & \textbf{Símbolo} & \textbf{Estado siguiente} \\
+\hline
+$q_0$ & http://, https://, www. & $q_{dominio}$ \\
+$q_{dominio}$ & / & $q_{ruta}$ \\
+$q_{dominio}$ & alnum, -, . & $q_{dominio}$ \\
+$q_{dominio}$ & otro & $q_{error}$ \\
+$q_{ruta}$ & alnum, /, ., ?, \&, = & $q_{ruta}$ \\
+$q_{ruta}$ & otro & $q_{error}$ \\
+\hline
+\end{tabular}
+\end{center}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=7cm,keepaspectratio]{url-automaton.png}
+    \caption{Diagrama de estados del UrlAutomaton.}
+    \label{fig:url-automaton}
+\end{figure}
+
+Los diagramas de estados fueron generados automáticamente utilizando la herramienta \texttt{state-machine-cat}.

@@ -1,0 +1,175 @@
+Los autómatas reconocedores implementados en el proyecto son:
+
+\subsection{CommandAutomaton}
+
+El \textbf{CommandAutomaton} reconoce comandos de formato delimitados por el símbolo \texttt{\$}. Se define formalmente como la quíntupla:
+
+\[
+M_{cmd} = (Q, \Sigma, \delta, q_0, F)
+\]
+
+donde:
+\begin{itemize}
+    \item $Q = \{q_0, q_1, q_2, q_3\}$: Estados que representan las fases de reconocimiento de un comando.
+    \item $\Sigma = \{\$, \text{alnum}, \text{newline}, \text{EOF}\}$: Alfabeto de entrada donde \texttt{alnum} representa cualquier carácter alfanumérico, \texttt{newline} representa el salto de línea y \texttt{EOF} representa el fin de texto.
+    \item $q_0$: Estado inicial donde el autómata busca el símbolo de inicio de comando.
+    \item $F = \{q_0\}$: Estado de aceptación que indica que el autómata está listo para procesar un nuevo comando.
+\end{itemize}
+
+\textbf{Descripción de estados:}
+\begin{itemize}
+    \item $q_0$ (Inicio): Estado inicial. El autómata busca el símbolo \texttt{\$} que indica el inicio de un comando.
+    \item $q_1$ (Lectura): Lee el nombre del comando. El autómata captura caracteres hasta encontrar el siguiente \texttt{\$} o un \texttt{newline}.
+    \item $q_2$ (Inline): Captura el valor para comandos inline. Este estado se activa cuando el comando es inline (como \texttt{bold} o \texttt{italic}).
+    \item $q_3$ (Línea): Captura el valor para comandos de línea. Este estado se activa cuando el comando es de línea (como \texttt{title} o \texttt{pass}).
+\end{itemize}
+
+\textbf{Tabla de transiciones:} La función de transición $\delta(q, a)$ define el siguiente estado dado el estado actual $q$ y el símbolo de entrada $a$.
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Estado actual} & \textbf{Símbolo} & \textbf{Estado siguiente} & \textbf{Acción} \\
+\hline
+$q_0$ & \texttt{\$} & $q_1$ & Iniciar captura del nombre \\
+$q_0$ & otro & $q_0$ & Ignorar, continuar buscando \\
+$q_1$ & \texttt{\$} & $q_2$ & Iniciar captura inline si es comando inline \\
+$q_1$ & \texttt{\$} & $q_3$ & Iniciar captura línea si es comando de línea \\
+$q_1$ & \texttt{newline} & $q_0$ & Descartar comando incompleto \\
+$q_1$ & alnum & $q_1$ & Agregar al nombre del comando \\
+$q_2$ & \texttt{\$} & $q_0$ & Finalizar comando inline, emite resultado \\
+$q_2$ & otro & $q_2$ & Agregar al valor del comando \\
+$q_3$ & \texttt{newline} & $q_0$ & Finalizar comando de línea, emite resultado \\
+$q_3$ & \texttt{EOF} & $q_0$ & Finalizar comando de línea al fin de texto \\
+$q_3$ & otro & $q_3$ & Agregar al valor del comando \\
+\hline
+\end{tabular}
+\end{center}
+
+El autómata distingue entre dos tipos de comandos:
+\begin{itemize}
+    \item \textbf{Comandos inline} (\$nombre\$valor\$): El comando termina con el delimitador \texttt{\$}. Ejemplo: \texttt{\$bold\$texto\$} aplica negrita.
+    \item \textbf{Comandos de línea} (\$nombre\$valor): El comando termina con \texttt{newline} o \texttt{EOF}. Ejemplo: \texttt{\$title\$Encabezado} crea un título.
+\end{itemize}
+
+La lógica de decisión entre estados $q_2$ y $q_3$ depende de si el nombre del comando es inline o de línea, según el alfabeto \texttt{CommandAlphabet}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=7cm,keepaspectratio]{command-automaton.png}
+    \caption{Diagrama de estados del CommandAutomaton. Se muestran las transiciones entre los estados $q_0$, $q_1$, $q_2$ y $q_3$, con las etiquetas de los símbolos de entrada.}
+    \label{fig:command-automaton}
+\end{figure}
+
+\subsection{EmailAutomaton}
+
+El \textbf{EmailAutomaton} valida direcciones de correo electrónico según el formato \texttt{local@dominio.tld}. Se define como:
+
+\[
+M_{email} = (Q, \Sigma, \delta, q_0, F)
+\]
+
+donde:
+\begin{itemize}
+    \item $Q = \{q_0, q_{local}, q_{dominio}, q_{tld}\}$: Estados para las fases de reconocimiento del correo electrónico.
+    \item $\Sigma = \{\text{alnum}, \text{@}, \text{.}, \text{\_}, \text{+}, \text{-}, \text{otro}\}$: Caracteres válidos en direcciones de correo.
+    \item $q_0$: Estado inicial donde se busca el inicio de una dirección de correo.
+    \item $F = \{q_{tld}\}$: Estado de aceptación cuando se ha completado el reconocimiento de un correo válido.
+\end{itemize}
+
+\textbf{Descripción de estados:}
+\begin{itemize}
+    \item $q_0$ (Inicio): Busca el inicio de una dirección de correo (carácter alfanumérico).
+    \item $q_{local}$ (Parte local): Captura la parte local del correo (antes del \texttt{@}). Acepta caracteres alfanuméricos, punto, guión bajo, signo más y guión.
+    \item $q_{dominio}$ (Dominio): Procesa el dominio después del \texttt{@}. Reconoce subdominios separados por puntos.
+    \item $q_{tld}$ (TLD): Captura la extensión del dominio (ej: com, org, edu.co). Este es el estado de aceptación.
+\end{itemize}
+
+\textbf{Tabla de transiciones:}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Estado actual} & \textbf{Símbolo} & \textbf{Estado siguiente} & \textbf{Acción} \\
+\hline
+$q_0$ & alnum & $q_{local}$ & Iniciar captura de parte local \\
+$q_0$ & otro & $q_0$ & Ignorar, continuar buscando \\
+$q_{local}$ & alnum & $q_{local}$ & Continuar capturando parte local \\
+$q_{local}$ & \texttt{@} & $q_{dominio}$ & Transición a dominio \\
+$q_{local}$ & . & $q_{local}$ & Permitir punto en parte local \\
+$q_{local}$ & \_ o + & $q_{local}$ & Permitir subguiones en parte local \\
+$q_{local}$ & otro & $q_0$ & Reiniciar, no es correo válido \\
+$q_{dominio}$ & alnum & $q_{dominio}$ & Continuar capturando dominio \\
+$q_{dominio}$ & . & $q_{tld}$ & Transición a TLD \\
+$q_{dominio}$ & otro & $q_0$ & Reiniciar, dominio inválido \\
+$q_{tld}$ & alnum & $q_{dominio}$ & Regresar a dominio (subdominio) \\
+$q_{tld}$ & otro & $q_0$ & Fin de correo, aceptar si TLD válido \\
+\hline
+\end{tabular}
+\end{center}
+
+El autómata valida que la parte local no contenga caracteres inválidos, que exista exactamente un \texttt{@}, que el dominio contenga al menos un punto, y que el TLD tenga al menos 2 caracteres. Se rechazan correos con múltiples \texttt{@} o TLDs incompletos.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=7cm,keepaspectratio]{email-automaton.png}
+    \caption{Diagrama de estados del EmailAutomaton. Se muestran las fases de reconocimiento de la parte local, el dominio y el TLD.}
+    \label{fig:email-automaton}
+\end{figure}
+
+\subsection{UrlAutomaton}
+
+El \textbf{UrlAutomaton} reconoce URLs con esquema \texttt{http://}, \texttt{https://} o \texttt{www.}. Se define como:
+
+\[
+M_{url} = (Q, \Sigma, \delta, q_0, F)
+\]
+
+donde:
+\begin{itemize}
+    \item $Q = \{q_0, q_{dominio}, q_{ruta}\}$: Estados para las fases de reconocimiento de URLs.
+    \item $\Sigma = \{\text{http://}, \text{https://}, \text{www.}, \text{alnum}, \text{/}, \text{.}, \text{-}, \text{otro}\}$: Caracteres válidos en URLs.
+    \item $q_0$: Estado inicial donde se detectan los esquemas de URL.
+    \item $F = \{q_{dominio}, q_{ruta}\}$: Estados de aceptación para URLs con dominio válido y opcionalmente con ruta.
+\end{itemize}
+
+\textbf{Descripción de estados:}
+\begin{itemize}
+    \item $q_0$ (Inicio): Detecta el esquema de la URL (http://, https:// o www.).
+    \item $q_{dominio}$ (Dominio): Captura el nombre de dominio incluyendo subdominios y guiones. Requiere al menos un punto y un TLD válido.
+    \item $q_{ruta}$ (Ruta): Captura la ruta del recurso después del primer \texttt{/}.
+\end{itemize}
+
+\textbf{Tabla de transiciones:}
+
+\begin{center}
+\begin{tabular}{|c|c|c|c|}
+\hline
+\textbf{Estado actual} & \textbf{Símbolo} & \textbf{Estado siguiente} & \textbf{Acción} \\
+\hline
+$q_0$ & http:// & $q_{dominio}$ & Iniciar captura de dominio \\
+$q_0$ & https:// & $q_{dominio}$ & Iniciar captura de dominio \\
+$q_0$ & www. & $q_{dominio}$ & Iniciar captura de dominio \\
+$q_0$ & otro & $q_0$ & Ignorar, continuar buscando \\
+$q_{dominio}$ & alnum o - & $q_{dominio}$ & Continuar capturando dominio \\
+$q_{dominio}$ & . & $q_{dominio}$ & Permitir punto en dominio \\
+$q_{dominio}$ & / & $q_{ruta}$ & Transición a ruta \\
+$q_{dominio}$ & : o ? o \& & $q_{dominio}$ & Permitir caracteres de puerto y query \\
+$q_{dominio}$ & otro & Evaluar TLD & Fin del dominio, validar TLD \\
+$q_{ruta}$ & alnum o / o . o - & $q_{ruta}$ & Continuar capturando ruta \\
+$q_{ruta}$ & ? o \# o \& o = & $q_{ruta}$ & Permitir query string y fragmentos \\
+$q_{ruta}$ & otro & Evaluar TLD & Fin de URL, validar TLD \\
+\hline
+\end{tabular}
+\end{center}
+
+El autómata verifica que el dominio contenga al menos un punto seguido de un TLD válido (mínimo 2 caracteres). Las URLs sin punto en el dominio son rechazadas.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=\textwidth,height=7cm,keepaspectratio]{url-automaton.png}
+    \caption{Diagrama de estados del UrlAutomaton. Se muestra la detección del esquema, la captura del dominio y la captura opcional de la ruta.}
+    \label{fig:url-automaton}
+\end{figure}
+
+Los diagramas de estados fueron generados automáticamente a partir de la especificación formal utilizando la herramienta \texttt{state-machine-cat}.
